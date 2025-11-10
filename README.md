@@ -40,3 +40,23 @@ create table tipoServico(
 	nome varchar(100),
 	descricao varchar(300)
 )
+
+# Tabela Mecanico
+
+CREATE TABLE mecanico (
+    id_mecanico INTEGER PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cargo VARCHAR(50),
+    id_gerente INTEGER, 
+    CONSTRAINT fk_gerente
+        FOREIGN KEY (id_gerente) 
+        REFERENCES mecanico(id_mecanico)
+);
+
+# Tabela fornecedor 
+
+CREATE TABLE forncedor(
+	id_forncedor INTEGER primary key,
+	nome varchar(100) not null,
+	descricao varchar(200)
+);

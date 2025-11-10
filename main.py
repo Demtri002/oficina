@@ -3,7 +3,6 @@ from database import conecta, encerra_conexao
 
 
 def insert_clientes(cursor, conection, nome, email, senha):
-    """Insere um novo cliente e retorna o ID."""
     cmd_insert = "INSERT INTO clientes (nome, email, senha) VALUES (%s, %s, %s) RETURNING id_cliente;" 
     values = nome, email, senha
     
@@ -17,6 +16,22 @@ def insert_clientes(cursor, conection, nome, email, senha):
         conection.rollback()
         print(f"\n❌ Erro ao cadastrar cliente. Tente novamente. Detalhe: {e}")
         return None
+
+def insert_mecanico(cursor, conection, nome, email, senha):
+    cmd_insert = "INSERT INTO mecanico (nome, email, senha) VALUES (%s, %s, %s) RETURNING id_mecanico;" 
+    values = nome, email, senha
+    
+    try:
+        cursor.execute(cmd_insert, values)
+        id_mecanico = cursor.fetchone()[0]
+        conection.commit()
+        print(f'\n✅ Cadastro realizado com sucesso! ID: {id_mecanico}')
+        return id_mecanico
+    except Exception as e:
+        conection.rollback()
+        print(f"\n❌ Erro ao cadastrar mecanico. Tente novamente. Detalhe: {e}")
+        return None
+
 
 def insert_veiculo(cursor, conection, id_veiculo, id_cliente, marca, modelo, cor, ano):
     """Insere um novo veículo associado a um cliente."""
@@ -32,7 +47,6 @@ def insert_veiculo(cursor, conection, id_veiculo, id_cliente, marca, modelo, cor
         print(f"❌ Erro ao inserir veículo. Detalhe: {e}")
 
 def insert_agendamento(cursor, conection, id_cliente, id_veiculo, data_agendamento):
-    """Cria um novo agendamento."""
     cmd_insert = "INSERT INTO agendamento (id_cliente, id_veiculo, data_hora_agendada) VALUES (%s, %s, %s);"
     values = id_cliente, id_veiculo, data_agendamento
     
@@ -44,8 +58,37 @@ def insert_agendamento(cursor, conection, id_cliente, id_veiculo, data_agendamen
         conection.rollback()
         print(f"❌ Erro ao agendar. Detalhe: {e}")
 
+def insert_peca(cursor, conection, id_peca, id_forncedor, nomepeca, descricao):
+    cmd_insert = "INSERT INTO peca(id_peca, id_forncedor, nomepeca, descricao) VALUES (%s, %s, %s, %s)" 
+    values = id_peca, id_forncedor, nomepeca, descricao
+
+    try:
+        cursor.execute(cmd_insert, values)
+        conection.commit()
+        print(f'Peça adicionada')
+    except Exception as e:
+        conection.rollback()
+        print(f"❌ Erro ao adiconar peça. Detalhe: {e}")
+
+
+#def fazer_login_admin(cursor, email, senha):
+ #   cmd_select = "SELECT id_mecanico, senha FROM gerente WHERE email = %s;"
+  #  cursor.execute(cmd_select, (email,))
+
+   #  resultado = cursor.fetchone()
+
+   #  if resultado:
+     #    id_mecanico, senha_armazenada_mecanico == resultado 
+     #    if senha_armazenada_mecanico == senha:
+     #        return id_mecanico
+     #    else:
+       #      print("\n❌ Senha incorreta.")
+      #       return None
+    # else:
+        #     print("\n❌ E-mail não encontrado.")
+        #     return None
+
 def fazer_login(cursor, email, senha):
-    """Verifica as credenciais do usuário."""
     cmd_select = "SELECT id_cliente, senha FROM clientes WHERE email = %s;"
     cursor.execute(cmd_select, (email,))
     
@@ -65,7 +108,6 @@ def fazer_login(cursor, email, senha):
 
 
 def fluxo_cadastro(cursor, conection):
-    """Gerencia a coleta de dados para cadastro."""
     print("\n--- NOVO CADASTRO ---")
     nome = input("Nome: ")
     email = input("Email: ")
@@ -73,7 +115,6 @@ def fluxo_cadastro(cursor, conection):
     insert_clientes(cursor, conection, nome, email, senha)
 
 def fluxo_insercao_operacoes(cursor, conection, id_cliente):
-    """Gerencia a inserção de veículo e agendamento após o login."""
     
     print(f"\n--- INSERÇÃO DE VEÍCULO (ID do Cliente: {id_cliente}) ---")
     
@@ -92,13 +133,12 @@ def fluxo_insercao_operacoes(cursor, conection, id_cliente):
 
 
 def menu_operacoes(cursor, conection, id_cliente):
-    """Menu exibido após o login."""
     print(f"\n🔑 Login bem-sucedido! Bem-vindo(a) (ID: {id_cliente})")
     
     while True:
         print("\n--- MENU DE OPERAÇÕES ---")
         print("1. Inserir Veículo e Agendamento")
-        print("3. Visualizar serviços")
+        #print("2. Visualizar serviços")
         print("3.. Logout")
         print("---------------------------")
         
