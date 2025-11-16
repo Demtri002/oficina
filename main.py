@@ -1,3 +1,4 @@
+# Importa as funções necessárias do módulo de banco de dados
 from database import (
     conecta, 
     encerra_conexao, 
@@ -7,6 +8,7 @@ from database import (
 )
 
 def executar_setup_inicial(conn):
+    """Executa a limpeza (DROP) e a criação (CREATE) das tabelas."""
     print("--- Iniciando Setup Automático ---")
     
     print("Limpando banco de dados (DROP CASCADE)...")
@@ -30,13 +32,14 @@ def menu_principal(conn):
         if escolha == '1':
             try:
                 nome = input("Digite o nome do cliente: ")
-                telefone = input("Digite o telefone do cliente: ")
+                email = input("Digite o email do cliente: ")
+                senha = input("Digite a senha do cliente: ")
                 
-                if not nome: 
-                    print("Erro: O nome não pode ser vazio.")
+                if not nome or not email: 
+                    print("Erro: Nome e Email são obrigatórios.")
                     continue 
 
-                cadastrar_cliente(conn, nome, telefone)
+                cadastrar_cliente(conn, nome, email, senha)
                 
             except Exception as e:
                 print(f"Erro durante o cadastro: {e}")

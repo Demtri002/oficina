@@ -24,37 +24,62 @@ def encerra_conexao(conn):
         print("Conexão com o BD encerrada.")
 
 
-def criar_tabelas(conn):    
+def criar_tabelas(conn):
     commands = (
         """
-        CREATE TABLE Clientes (
-            cliente_id SERIAL PRIMARY KEY,
+        CREATE TABLE clientes(
+            id_cliente SERIAL primary key,
+            nome varchar(100),
+            email varchar(100),
+            senha varchar(50)
+        );
+        """,
+        """
+        CREATE TABLE tipoServico(
+            tipoServico serial primary key,
+            nome varchar(100),
+            descricao varchar(300)
+        );
+        """,
+        """
+        CREATE TABLE mecanico (
+            id_mecanico INTEGER PRIMARY KEY,
             nome VARCHAR(100) NOT NULL,
-            telefone VARCHAR(20)
+            cargo VARCHAR(50),
+            id_gerente INTEGER, 
+            CONSTRAINT fk_gerente
+                FOREIGN KEY (id_gerente) 
+                REFERENCES mecanico(id_mecanico)
         );
         """,
         """
-        CREATE TABLE Veiculos (
-            veiculo_id SERIAL PRIMARY KEY,
-            placa VARCHAR(10) NOT NULL UNIQUE,
-            modelo VARCHAR(50),
-            ano INTEGER,
-            cliente_id INTEGER,
-            FOREIGN KEY (cliente_id)
-                REFERENCES Clientes (cliente_id)
-                ON DELETE SET NULL
+        CREATE TABLE fornecedor(
+            id_fornecedor INTEGER primary key,
+            nome varchar(100) not null,
+            descricao varchar(200)
         );
         """,
         """
-        CREATE TABLE Servicos (
-            servico_id SERIAL PRIMARY KEY,
-            veiculo_id INTEGER NOT NULL,
-            descricao VARCHAR(255) NOT NULL,
-            data DATE NOT NULL DEFAULT CURRENT_DATE,
-            valor DECIMAL(10, 2),
-            FOREIGN KEY (veiculo_id)
-                REFERENCES Veiculos (veiculo_id)
-                ON DELETE CASCADE
+        CREATE TABLE veiculo(
+            id_veiculo char(7) primary key,
+            id_cliente int not null,
+            marca varchar(50),
+            modelo varchar(100),
+            cor varchar(50),
+            ano int,
+            CONSTRAINT fk_veiculo_cliente
+                FOREIGN KEY (id_cliente)
+                REFERENCES CLIENTES (id_cliente)
+        );
+        """,
+        """
+        CREATE TABLE agendamento(
+            id_agendamento SERIAL primary key,
+            id_veiculo char(7) not null ,
+            data_agendamento TIMESTAMP,
+            CONSTRAINT fk_agendamento_veiculo
+                FOREIGN KEY (id_veiculo)
+                REFERENCES VEICULO (id_veiculo)
         );
         """
     )
@@ -62,6 +87,8 @@ def criar_tabelas(conn):
     cur = None
     try:
         cur = conn.cursor()
+        print("Criando tabelas na seguinte ordem:")
+        print("1. clientes, 2. tipoServico, 3. mecanico, 4. fornecedor, 5. veiculo, 6. agendamento")
         for command in commands:
             cur.execute(command)
         conn.commit()
@@ -76,9 +103,12 @@ def criar_tabelas(conn):
 def eliminar_tabelas(conn):
     
     commands = (
-        "DROP TABLE IF EXISTS Servicos CASCADE;",
-        "DROP TABLE IF EXISTS Veiculos CASCADE;",
-        "DROP TABLE IF EXISTS Clientes CASCADE;"
+        "DROP TABLE IF EXISTS agendamento CASCADE;",
+        "DROP TABLE IF EXISTS veiculo CASCADE;",
+        "DROP TABLE IF EXISTS clientes CASCADE;",
+        "DROP TABLE IF EXISTS tipoServico CASCADE;",
+        "DROP TABLE IF EXISTS mecanico CASCADE;",
+        "DROP TABLE IF EXISTS fornecedor CASCADE;" 
     )
     
     cur = None
@@ -96,14 +126,13 @@ def eliminar_tabelas(conn):
             cur.close()
 
 
-def cadastrar_cliente(conn, nome, telefone):
-    
-    sql = "INSERT INTO Clientes (nome, telefone) VALUES (%s, %s);"
+def cadastrar_cliente(conn, nome, email, senha):    
+    sql = "INSERT INTO clientes (nome, email, senha) VALUES (%s, %s, %s);"
     
     cur = None
     try:
         cur = conn.cursor()
-        cur.execute(sql, (nome, telefone))
+        cur.execute(sql, (nome, email, senha))
         conn.commit()
         print(f"Cliente '{nome}' cadastrado com sucesso!")
         
