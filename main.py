@@ -1,4 +1,5 @@
 from database import *
+from ai_integration import perguntar_ao_banco_com_ia
 
 def login_mecanico():
     """Simula um login. Em um sistema real, verificaria usuário e senha."""
@@ -108,8 +109,7 @@ def menu_cadastros(conn):
         else:
             print("Escolha inválida.")
         
-        
-
+    
 def menu_relatorios(conn):
     """Exibe o sub-menu de relatórios."""
     while True:
@@ -119,6 +119,7 @@ def menu_relatorios(conn):
         print("3. Consultar Agendamentos")
         print("4. Consultar Serviços Realizados")
         print("5. Consultar Faturamento Mensal")
+        print("6. Consultar com Gemini")
         print("0. Voltar ao Menu Principal")
         escolha = input("Digite sua escolha: ")
 
@@ -132,6 +133,9 @@ def menu_relatorios(conn):
             listar_servicos_realizados(conn)
         elif escolha == '5':
             consultar_faturamento_mensal(conn)
+        elif escolha == '6':
+            prompt = input("Faça sua pergunta: ")
+            perguntar_ao_banco_com_ia(prompt, conn)
         elif escolha == '0':
             break
         else:
