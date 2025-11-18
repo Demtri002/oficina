@@ -1,10 +1,9 @@
 import google.genai as genai
 import os
 
-genai.configure(api_key=os.environ["AIzaSyD0AySEzmIEUBXgCDuN_CPuHZYoHocCbXU"])
+client = genai.Client(api_key="AIzaSyD0AySEzmIEUBXgCDuN_CPuHZYoHocCbXU")
 
-model_sql = genai.GenerativeModel('gemini-2.5-pro')
-model_interpreter = genai.GenerativeModel('gemini-2.5-pro')
+
 
 def get_db_schema(conn):
     schema_str = ""
@@ -79,7 +78,7 @@ def perguntar_ao_banco_com_ia(pergunta_usuario, conn):
     """
     
     try:
-        response = model_sql.generate_content(prompt_sql)
+        response = client.models.generate_content(model = 'gemini-2.5-pro', contents = prompt_sql)
         sql_query = response.text.strip().replace("```sql", "").replace("```", "")
         print(f"Query gerada:\n{sql_query}")
     except Exception as e:
@@ -93,7 +92,7 @@ def perguntar_ao_banco_com_ia(pergunta_usuario, conn):
     
     print(f"Resultados Brutos: {resultados_data}")
 
-    prompt_interpretador = f"""
+    prompt_2 = f"""
     Você é um assistente de dados amigável.
     A pergunta original do usuário foi:
     "{pergunta_usuario}"
@@ -109,7 +108,7 @@ def perguntar_ao_banco_com_ia(pergunta_usuario, conn):
     """
 
     try:
-        response = model_interpreter.generate_content(prompt_interpretador)
+        response = client.models.generate_content(model = 'gemini-2.5-pro', contents = prompt_2)
         resposta_final = response.text.strip()
         return resposta_final
     except Exception as e:
