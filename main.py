@@ -2,7 +2,6 @@ from database import *
 from ai_integration import perguntar_ao_banco_com_ia
 
 def login_mecanico():
-    """Simula um login. Em um sistema real, verificaria usuário e senha."""
     print("--- Sistema de Gerenciamento da Oficina ---")
     nome = input("Digite seu nome (Mecânico/Admin) para logar: ")
     if not nome:
@@ -13,7 +12,6 @@ def login_mecanico():
     return True
 
 def executar_setup_inicial(conn):
-    """Executa a limpeza (DROP) e a criação (CREATE) das tabelas."""
     print("--- ATENÇÃO: MODO ADMIN ---")
     confirm = input("Isso irá APAGAR TODOS os dados. Deseja recriar o banco? (s/n): ")
     if confirm.lower() == 's':
@@ -24,7 +22,6 @@ def executar_setup_inicial(conn):
         print("Operação cancelada.")
 
 def menu_cadastros(conn):
-    """Exibe o sub-menu de cadastros."""
     while True:
         print("\n--- Menu de Cadastros ---")
         print("1. Cadastrar Cliente")
@@ -111,7 +108,6 @@ def menu_cadastros(conn):
         
     
 def menu_relatorios(conn):
-    """Exibe o sub-menu de relatórios."""
     while True:
         print("\n--- Menu de Relatórios ---")
         print("1. Consultar Clientes")
@@ -142,7 +138,6 @@ def menu_relatorios(conn):
             print("Escolha inválida.")
 
 def menu_atualizacoes(conn):
-    """Exibe o sub-menu de atualizações."""
     while True:
         print("\n--- Menu de Atualizações ---")
         print("1. Atualizar Cadastro de Cliente")

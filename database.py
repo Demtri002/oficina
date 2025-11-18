@@ -3,7 +3,6 @@ from psycopg2 import OperationalError, Error
 
 
 def conecta():
-    """Tenta conectar ao banco de dados PostgreSQL."""
     conn = None
     try:
         conn = psycopg2.connect(
@@ -25,81 +24,257 @@ def conecta():
         return None
 
 def encerra_conexao(conn):
-    """Encerra a conexão com o banco de dados, se estiver ativa."""
     if conn:
         conn.close()
 
 
 def criar_tabelas(conn):
-    """
-    Cria a estrutura de tabelas no banco de dados. 
-    Usa 'CREATE TABLE IF NOT EXISTS' para rodar sem erros.
-    """
     commands = (
         """
-        CREATE TABLE IF NOT EXISTS clientes(
-            id_cliente SERIAL PRIMARY KEY,
-            nome VARCHAR(100) NOT NULL,
-            cpf VARCHAR(14) UNIQUE NOT NULL,
-            endereco VARCHAR(200),
-            telefone VARCHAR(20)
+        CREATE TABLE IF NOT EXISTS cliente (
+            id_cliente INT PRIMARY KEY,
+            nome VARCHAR(100),
+            telefone CHAR(11),
+            email VARCHAR(100)
         );
         """,
         """
+        CREATE TABLE IF NOT EXISTS fornecedor (
+            id_fornecedor INT PRIMARY KEY,
+            nome VARCHAR(100)
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS tipo_servico (
+            id_tiposervico INT PRIMARY KEY,
+            descricao VARCHAR(100),
+            nome VARCHAR(100)
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS tipo_pagamento (
+            id_tipopagamento INT PRIMARY KEY,
+            cnpj VARCHAR(100)
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS Faturamento (
+            id_faturamento INT PRIMARY KEY,
+            valor_total INT
+        );
+        """,
+         """
         CREATE TABLE IF NOT EXISTS mecanico (
-            id_mecanico SERIAL PRIMARY KEY,
-            nome VARCHAR(100) NOT NULL,
-            cargo VARCHAR(50)
+            id_mecanico INT PRIMARY KEY,
+            nome VARCHAR(100),
+            cargo VARCHAR(100),
+            email VARCHAR(100),
+            fk_mecanico_id_mecanico INT
         );
         """,
         """
-        CREATE TABLE IF NOT EXISTS tipoServico(
-            id_tipoServico SERIAL PRIMARY KEY,
-            nome VARCHAR(100) NOT NULL,
-            descricao VARCHAR(300),
-            valor_padrao DECIMAL(10, 2)
-        );
-        """,
-        """
-        CREATE TABLE IF NOT EXISTS veiculo(
-            placa CHAR(7) PRIMARY KEY,
-            id_cliente INT NOT NULL,
-            marca VARCHAR(50),
-            modelo VARCHAR(100),
+        CREATE TABLE IF NOT EXISTS veiculo (
+            id_veiculo INT PRIMARY KEY,
+            marca VARCHAR(100),
+            cor VARCHAR(100),
             ano INT,
-            cor VARCHAR(50),
-            CONSTRAINT fk_veiculo_cliente
-                FOREIGN KEY (id_cliente)
-                REFERENCES clientes (id_cliente)
-                ON DELETE CASCADE
+            modelo VARCHAR(100),
+            fk_cliente_id_cliente INT,
+            placa char(7)
         );
         """,
         """
-        CREATE TABLE IF NOT EXISTS agendamento(
-            id_agendamento SERIAL PRIMARY KEY,
-            placa CHAR(7) NOT NULL,
-            id_tipoServico INT NOT NULL,
-            data_agendamento TIMESTAMP NOT NULL,
-            status VARCHAR(50) DEFAULT 'Agendado', 
-            CONSTRAINT fk_agendamento_veiculo
-                FOREIGN KEY (placa)
-                REFERENCES veiculo (placa)
-                ON DELETE CASCADE,
-            CONSTRAINT fk_agendamento_servico
-                FOREIGN KEY (id_tipoServico)
-                REFERENCES tipoServico (id_tipoServico)
+        CREATE TABLE IF NOT EXISTS peca (
+            id_peca INT PRIMARY KEY,
+            nome_peca VARCHAR(100),
+            descricao_peca VARCHAR(100),
+            fk_fornecedor_id_fornecedor INT
         );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS servico (
+            id_servico INT PRIMARY KEY,
+            nome VARCHAR(100),
+            descricao VARCHAR(100),
+            fk_veiculo_id_veiculo INT,
+            fk_tipo_servico_id_tiposervico INT
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS agendamento (
+            id_agendamento INT PRIMARY KEY,
+            data TIMESTAMP,
+            fk_veiculo_id_veiculo INT
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS nota_fiscal (
+            id_notafiscal INT PRIMARY KEY,
+            valor_pagamento INT,
+            fk_servico_id_servico INT,
+            fk_tipo_pagamento_id_tipopagamento INT,
+            fk_Faturamento_id_faturamento INT
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS servico_peca (
+            fk_peca_id_peca INT,
+            fk_servico_id_servico INT
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS mecanico_servico (
+            fk_mecanico_id_mecanico INT,
+            fk_servico_id_servico INT
+        );
+        """,
+     
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_veiculo_2') THEN
+                ALTER TABLE veiculo ADD CONSTRAINT FK_veiculo_2
+                    FOREIGN KEY (fk_cliente_id_cliente)
+                    REFERENCES cliente (id_cliente)
+                    ON DELETE CASCADE;
+            END IF;
+        END $$;
+        """,
+        
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_servico_2') THEN
+                ALTER TABLE servico ADD CONSTRAINT FK_servico_2
+                    FOREIGN KEY (fk_veiculo_id_veiculo)
+                    REFERENCES veiculo (id_veiculo)
+                    ON DELETE CASCADE;
+            END IF;
+        END $$;
+        """,
+        """
+        DO $$ BEGIN
+             IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_servico_3') THEN
+                ALTER TABLE servico ADD CONSTRAINT FK_servico_3
+                    FOREIGN KEY (fk_tipo_servico_id_tiposervico)
+                    REFERENCES tipo_servico (id_tiposervico)
+                    ON DELETE CASCADE;
+             END IF;
+        END $$;
+        """,
+
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_peca_2') THEN
+                ALTER TABLE peca ADD CONSTRAINT FK_peca_2
+                    FOREIGN KEY (fk_fornecedor_id_fornecedor)
+                    REFERENCES fornecedor (id_fornecedor)
+                    ON DELETE CASCADE;
+            END IF;
+        END $$;
+        """,
+
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_nota_fiscal_2') THEN
+                ALTER TABLE nota_fiscal ADD CONSTRAINT FK_nota_fiscal_2
+                    FOREIGN KEY (fk_servico_id_servico)
+                    REFERENCES servico (id_servico)
+                    ON DELETE CASCADE;
+            END IF;
+        END $$;
+        """,
+        """
+        DO $$ BEGIN
+             IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_nota_fiscal_3') THEN
+                ALTER TABLE nota_fiscal ADD CONSTRAINT FK_nota_fiscal_3
+                    FOREIGN KEY (fk_tipo_pagamento_id_tipopagamento)
+                    REFERENCES tipo_pagamento (id_tipopagamento)
+                    ON DELETE RESTRICT;
+             END IF;
+        END $$;
+        """,
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_nota_fiscal_4') THEN
+                ALTER TABLE nota_fiscal ADD CONSTRAINT FK_nota_fiscal_4
+                    FOREIGN KEY (fk_Faturamento_id_faturamento)
+                    REFERENCES Faturamento (id_faturamento)
+                    ON DELETE RESTRICT;
+            END IF;
+        END $$;
+        """,
+
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_mecanico_2') THEN
+                ALTER TABLE mecanico ADD CONSTRAINT FK_mecanico_2
+                    FOREIGN KEY (fk_mecanico_id_mecanico)
+                    REFERENCES mecanico (id_mecanico);
+            END IF;
+        END $$;
+        """,
+
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_agendamento_2') THEN
+                ALTER TABLE agendamento ADD CONSTRAINT FK_agendamento_2
+                    FOREIGN KEY (fk_veiculo_id_veiculo)
+                    REFERENCES veiculo (id_veiculo)
+                    ON DELETE CASCADE;
+            END IF;
+        END $$;
+        """,
+
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_servico_peca_1') THEN
+                ALTER TABLE servico_peca ADD CONSTRAINT FK_servico_peca_1
+                    FOREIGN KEY (fk_peca_id_peca)
+                    REFERENCES peca (id_peca)
+                    ON DELETE SET NULL;
+            END IF;
+        END $$;
+        """,
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_servico_peca_2') THEN
+                ALTER TABLE servico_peca ADD CONSTRAINT FK_servico_peca_2
+                    FOREIGN KEY (fk_servico_id_servico)
+                    REFERENCES servico (id_servico)
+                    ON DELETE SET NULL;
+             END IF;
+        END $$;
+        """,
+
+        """
+        DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_mecanico_servico_1') THEN
+                ALTER TABLE mecanico_servico ADD CONSTRAINT FK_mecanico_servico_1
+                    FOREIGN KEY (fk_mecanico_id_mecanico)
+                    REFERENCES mecanico (id_mecanico)
+                    ON DELETE RESTRICT;
+            END IF;
+        END $$;
+        """,
+        """
+        DO $$ BEGIN
+             IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_mecanico_servico_2') THEN
+                ALTER TABLE mecanico_servico ADD CONSTRAINT FK_mecanico_servico_2
+                    FOREIGN KEY (fk_servico_id_servico)
+                    REFERENCES servico (id_servico)
+                    ON DELETE SET NULL;
+             END IF;
+        END $$;
         """
     )
     
     cur = None
     try:
         cur = conn.cursor()
-        print("Verificando/Criando tabelas...")
+        print("Verificando/Criando tabelas e constraints...")
         for command in commands:
             cur.execute(command)
         conn.commit()
-        print("Estrutura de tabelas verificada com sucesso!")
+        print("Estrutura de tabelas (Lógico_2) verificada com sucesso!")
     except (Exception, psycopg2.DatabaseError) as error:
         print(f"Erro ao criar tabelas: {error}")
         conn.rollback()
@@ -107,14 +282,24 @@ def criar_tabelas(conn):
         if cur:
             cur.close()
 
+
+
 def eliminar_tabelas(conn):
-    """Elimina (DROP) todas as tabelas. APENAS PARA TESTES."""
+    
     commands = (
+        "DROP TABLE IF EXISTS mecanico_servico CASCADE;",
+        "DROP TABLE IF EXISTS servico_peca CASCADE;",
+        "DROP TABLE IF EXISTS nota_fiscal CASCADE;",
         "DROP TABLE IF EXISTS agendamento CASCADE;",
+        "DROP TABLE IF EXISTS servico CASCADE;",
+        "DROP TABLE IF EXISTS peca CASCADE;",
         "DROP TABLE IF EXISTS veiculo CASCADE;",
-        "DROP TABLE IF EXISTS clientes CASCADE;",
-        "DROP TABLE IF EXISTS tipoServico CASCADE;",
-        "DROP TABLE IF EXISTS mecanico CASCADE;"
+        "DROP TABLE IF EXISTS mecanico CASCADE;",
+        "DROP TABLE IF EXISTS Faturamento CASCADE;",
+        "DROP TABLE IF EXISTS tipo_pagamento CASCADE;",
+        "DROP TABLE IF EXISTS tipo_servico CASCADE;",
+        "DROP TABLE IF EXISTS fornecedor CASCADE;",
+        "DROP TABLE IF EXISTS cliente CASCADE;"
     )
     cur = None
     try:
@@ -286,7 +471,6 @@ def atualizar_mecanico(conn, id_mecanico, nome, cargo):
 
 
 def buscar_cliente_por_cpf(conn, cpf):
-    """Busca um cliente pelo CPF e retorna seu ID e Nome. Retorna None se não achar."""
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT id_cliente, nome FROM clientes WHERE cpf = %s;", (cpf,))
@@ -297,7 +481,6 @@ def buscar_cliente_por_cpf(conn, cpf):
         return None
 
 def buscar_veiculo_por_placa(conn, placa):
-    """Verifica se uma placa existe. Retorna True se existir."""
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT 1 FROM veiculo WHERE placa = %s;", (placa,))
@@ -307,7 +490,6 @@ def buscar_veiculo_por_placa(conn, placa):
         return False
         
 def listar_servicos_simples(conn):
-    """Lista serviços (ID, Nome, Valor) para seleção no menu."""
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT id_tipoServico, nome, valor_padrao FROM tipoServico ORDER BY nome;")
