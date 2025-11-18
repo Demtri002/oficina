@@ -230,6 +230,8 @@ def menu_relatorios(conn):
         print("5. Consultar Serviços Finalizados")
         print("6. Consultar Faturamento por Período")
         print("7. Consultar com IA (Gemini)")
+        print("8. Consultar Mecânicos")
+        print("9. Consultar Fornecedores")
         print("0. Voltar ao Menu Principal")
         escolha = input("Digite sua escolha: ")
 
@@ -259,7 +261,12 @@ def menu_relatorios(conn):
             print("\n--- Assistente Virtual ---")
             print("Ex: 'Liste todos os clientes', 'Quantos veículos temos?', 'Mostre os agendamentos'")
             prompt = input("Faça sua pergunta ao banco: ")
-            perguntar_ao_banco_com_ia(prompt, conn)
+            resposta = perguntar_ao_banco_com_ia(prompt, conn)
+            print(f"{resposta}")
+        elif escolha == '8':
+            listar_mecanicos(conn)
+        elif escolha == '9':
+            listar_fornecedores(conn)
         elif escolha == '0':
             break
         else:

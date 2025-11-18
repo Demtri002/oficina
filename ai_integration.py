@@ -62,7 +62,7 @@ def perguntar_ao_banco_com_ia(pergunta_usuario, conn):
     except Exception as e:
         return f"Erro ao conectar ou obter schema: {e}"
     
-    prompt_sql = f"""
+    prompt = f"""
     Você é um assistente de banco de dados especialista em PostgreSQL.
     Sua tarefa é converter a pergunta do usuário em uma consulta SQL válida.
     O dialeto é PostgreSQL.
@@ -73,12 +73,15 @@ def perguntar_ao_banco_com_ia(pergunta_usuario, conn):
     Pergunta do usuário:
     "{pergunta_usuario}"
     
-    Gere *apenas* a consulta SQL. A consulta deve ser um SELECT.
-    Não inclua nenhuma explicação, markdown (```sql) ou texto introdutório.
+    REGRAS OBRIGATÓRIAS:
+    1. Gere *apenas* a consulta SQL. A consulta deve ser um SELECT.
+    2. Não inclua nenhuma explicação, markdown (```sql) ou texto introdutório.
+    3. IMPORTANTE: Ao filtrar por texto (nomes, cores, marcas, etc), use SEMPRE o operador 'ILIKE' para ignorar maiúsculas/minúsculas. 
+       Exemplo: Em vez de "cor = 'prata'", use "cor ILIKE 'prata'".
     """
     
     try:
-        response = client.models.generate_content(model = 'gemini-2.5-pro', contents = prompt_sql)
+        response = client.models.generate_content(model = 'gemini-2.5-pro', contents = prompt)
         sql_query = response.text.strip().replace("```sql", "").replace("```", "")
         print(f"Query gerada:\n{sql_query}")
     except Exception as e:

@@ -654,9 +654,12 @@ def listar_veiculos(conn):
         with conn.cursor() as cur:
             cur.execute(sql)
             veiculos = cur.fetchall()
-            print("\n--- Lista de Veículos ---")
+            print("\n--- Lista de Veículos ---------------------------------------------------------------")
+            print("{:<5} | {:<15} | {:<15} | {:<7} | {:<4} | {:<10} | {:<5}".format("ID", "Marca", "Modelo", "Placa", "Ano", "Cor", "ID Cliente"))
+            print("-" * 85)
             for veiculo in veiculos:
-                print(f"ID: {veiculo[0]}, Marca: {veiculo[1]}, Modelo: {veiculo[2]}, Placa: {veiculo[3]}, Ano: {veiculo[4]}, Cor: {veiculo[5]}, ID Cliente: {veiculo[6]}")
+                print("{:<5} | {:<15} | {:<15} | {:<7} | {:<4} | {:<10} | {:<5}".format(veiculo[0], veiculo[1], veiculo[2], veiculo[3], veiculo[4], veiculo[5], veiculo[6]))
+                print("-" * 85)
     except DatabaseError as e:
         print(f" Erro ao listar veículos: {e}")
 
@@ -667,8 +670,11 @@ def listar_mecanicos(conn):
             cur.execute(sql)
             mecanicos = cur.fetchall()
             print("\n--- Lista de Mecânicos ---")
+            print("{:<5} | {:<30} | {:<15} | {:<40} | {:<5}".format("ID", "Nome", "Cargo", "Email", "ID Supervisor"))
+            print("-" * 60)
             for mecanico in mecanicos:
-                print(f"ID: {mecanico[0]}, Nome: {mecanico[1]}, Cargo: {mecanico[2]}, Email: {mecanico[3]}, ID Supervisor: {mecanico[4]}")
+                print("{:<5} | {:<30} | {:<15} | {:<40} | {:<5}".format(mecanico[0], mecanico[1], mecanico[2], mecanico[3], mecanico[4]))
+                print("-" * 60)
     except DatabaseError as e:
         print(f" Erro ao listar mecânicos: {e}")
 
@@ -679,8 +685,11 @@ def listar_fornecedores(conn):
             cur.execute(sql)
             fornecedores = cur.fetchall()
             print("\n--- Lista de Fornecedores ---")
+            print("{:<5} | {:<30} ".format("ID", "Nome"))
+            print("-" * 40)
             for fornecedor in fornecedores:
-                print(f"ID: {fornecedor[0]}, Nome: {fornecedor[1]}")
+                print("{:<5} | {:<30} ".format(fornecedor[0], fornecedor[1]))
+                print("-" * 40)
     except DatabaseError as e:
         print(f" Erro ao listar fornecedores: {e}")
 
@@ -691,8 +700,11 @@ def listar_agendamentos(conn):
             cur.execute(sql)
             agendamentos = cur.fetchall()
             print("\n--- Lista de Agendamentos ---")
+            print("{:<5} | {:<10} | {:<5}".format("ID", "Data", "ID Veículo"))
+            print("-" * 30)
             for agendamento in agendamentos:
-                print(f"ID: {agendamento[0]}, Data: {agendamento[1]}, ID Veículo: {agendamento[2]}")
+                print("{:<5} | {:<10} | {:<5}".format(agendamento[0], agendamento[1], agendamento[2]))
+                print("-" * 30)
     except DatabaseError as e:
         print(f" Erro ao listar agendamentos: {e}")
 
