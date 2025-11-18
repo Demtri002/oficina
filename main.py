@@ -13,11 +13,12 @@ def login_mecanico():
 
 def executar_setup_inicial(conn):
     print("--- ATENÇÃO: MODO ADMIN ---")
-    confirm = input("Isso irá APAGAR TODOS os dados. Deseja recriar o banco? (s/n): ")
+    print("Esta operação apagará TODAS as tabelas e dados existentes.")
+    confirm = input("Tem certeza que deseja zerar o banco? (s/n): ")
     if confirm.lower() == 's':
         eliminar_tabelas(conn)
         criar_tabelas(conn)
-        print("--- Banco de dados recriado ---")
+        print("--- Banco de dados recriado com sucesso! ---")
     else:
         print("Operação cancelada.")
 
@@ -28,78 +29,98 @@ def menu_cadastros(conn):
         print("2. Cadastrar Veículo")
         print("3. Cadastrar Agendamento")
         print("4. Cadastrar Mecânico")        
-        print("5. Cadastrar tipos de Serviço")
+        print("5. Cadastrar Tipos de Serviço")
+        print("6. Cadastrar Peça")
+        print("7. Cadastrar Fornecedor")
         print("0. Voltar ao Menu Principal")
         escolha = input("Digite sua escolha: ")
 
         if escolha == '1':
-            print("--- Novo Cliente ---")
+            print("\n--- Novo Cliente ---")
             nome = input("Nome: ")
-            cpf = input("CPF (apenas números): ")
-            endereco = input("Endereço: ")
             telefone = input("Telefone: ")
-            if nome and cpf:
-                cadastrar_cliente(conn, nome, cpf, endereco, telefone)
+            email = input("Email: ")
+            cpf = input("CPF: ")
+            endereco = input("Endereço: ")
+            
+            if nome:
+                cadastrar_cliente(conn, nome, telefone, email, cpf, endereco)
             else:
-                print("Nome e CPF são obrigatórios.")
+                print("Nome é obrigatório.")
         
         elif escolha == '2':
-            print("--- Novo Veículo ---")
-            cpf_cliente = input("Digite o CPF do cliente dono do veículo: ")
-            cliente = buscar_cliente_por_cpf(conn, cpf_cliente)
-            
-            if cliente:
-                id_cliente, nome_cliente = cliente
-                print(f"Cliente encontrado: {nome_cliente}")
-                placa = input("Placa (7 dígitos): ").upper()
-                marca = input("Marca: ")
-                modelo = input("Modelo: ")
-                if placa and id_cliente and marca and modelo:
-                    cadastrar_veiculo(conn, placa, id_cliente, marca, modelo)
+            print("\n--- Novo Veículo ---")
+    
+            cpf_cliente = input("Digite o CPF do proprietário: ") # Agora pede o CPF
+            placa = input("Placa (7 caracteres): ").upper()
+            marca = input("Marca: ")
+            modelo = input("Modelo: ")
+            cor = input("Cor: ")
+    
+            try:
+                ano = int(input("Ano: "))
+        
+                if placa and marca and modelo and cpf_cliente:
+                    cadastrar_veiculo(conn, marca, cor, ano, modelo, placa, cpf_cliente)
                 else:
-                    print("Placa, Marca e Modelo são obrigatórios.")
-            else:
-                print("Cliente não encontrado. Cadastre o cliente primeiro.")
+                    print("Todos os dados são obrigatórios.")
+            except ValueError:
+                print("Erro: O Ano deve ser numérico.")
         
         elif escolha == '3':
-            print("--- Novo Agendamento ---")
-            placa = input("Placa do veículo: ").upper()
-            if not buscar_veiculo_por_placa(conn, placa):
-                print("Veículo não cadastrado. Cadastre o veículo primeiro.")
-                continue # Volta ao menu de cadastros
-            
-            servicos = listar_servicos_simples(conn)
-            if not servicos:
-                print("Cadastre os tipos de serviço primeiro.")
-                continue
-                
-            id_servico = input("Digite o ID do serviço desejado: ")
-            data = input("Data e Hora (Formato: AAAA-MM-DD HH:MM): ")
-            
-            cadastrar_agendamento(conn, placa, int(id_servico), data)
+            print("\n--- Novo Agendamento ---")
+            listar_veiculos(conn) 
+
+            placa = input("Digite a Placa do Veículo: ").upper()
+            data = input("Data e Hora (AAAA-MM-DD HH:MM:SS): ")
+    
+            if placa and data:
+                cadastrar_agendamento(conn, data, placa)
+            else:
+                print("Placa e Data são obrigatórios.")
             
         elif escolha == '4':
-            print("--- Novo Mecânico ---")
+            print("\n--- Novo Mecânico ---")
             nome = input("Nome: ")
-            cargo = input("Cargo (Ex: Chefe de Oficina, Eletricista): ")
+            cargo = input("Cargo: ")
+            email = input("Email: ")
+            
+            # Opcional: Supervisor
+            tem_supervisor = input("Tem supervisor? (s/n): ").lower()
+            id_supervisor = None
+            if tem_supervisor == 's':
+                id_supervisor = input("ID do Supervisor: ")
+            
             if nome and cargo:
-                cadastrar_mecanico(conn, nome, cargo)
+                cadastrar_mecanico(conn, nome, cargo, email, id_supervisor)
             else:
                 print("Nome e Cargo são obrigatórios.")
 
         elif escolha == '5':
-            print("--- Novo Tipo de Serviço ---") 
-            nome = input("Nome do Serviço (Ex: Troca de Óleo): ") 
-            preco = input("Preço Padrão (Ex: 150.00): ")
+            print("\n--- Novo Tipo de Serviço ---") 
+            nome = input("Nome do Serviço: ") 
+            descricao = input("Descrição: ")
             
-            if nome and preco:
-                try:
-                    preco_float = float(preco)
-                    cadastrar_tipo_servico(conn, nome, preco_float)
-                except ValueError:
-                    print("Erro: O preço deve ser um número (ex: 150.00)")
+            if nome:
+                cadastrar_tipo_servico(conn, nome, descricao)
             else:
-                print("Nome e Preço são obrigatórios.")
+                print("Nome é obrigatório.")
+
+        elif escolha == '6':
+             print("\n--- Nova Peça ---")
+             nome_peca = input("Nome da Peça: ")
+             descricao = input("Descrição: ")
+             try:
+                 id_fornecedor = int(input("ID do Fornecedor: "))
+                 cadastrar_peca(conn, nome_peca, descricao, id_fornecedor)
+             except ValueError:
+                 print("ID do fornecedor inválido.")
+
+        elif escolha == '7':
+            print("\n--- Novo Fornecedor ---")
+            nome = input("Nome do Fornecedor: ")
+            if nome:
+                cadastrar_fornecedor(conn, nome)
 
         elif escolha == '0':
             break 
@@ -113,9 +134,8 @@ def menu_relatorios(conn):
         print("1. Consultar Clientes")
         print("2. Consultar Veículos")
         print("3. Consultar Agendamentos")
-        print("4. Consultar Serviços Realizados")
-        print("5. Consultar Faturamento Mensal")
-        print("6. Consultar com Gemini")
+        print("4. Consultar Serviços Realizados (Não implementado)")
+        print("6. Consultar com IA (Gemini)")
         print("0. Voltar ao Menu Principal")
         escolha = input("Digite sua escolha: ")
 
@@ -125,12 +145,10 @@ def menu_relatorios(conn):
             listar_veiculos(conn)
         elif escolha == '3':
             listar_agendamentos(conn)
-        elif escolha == '4':
-            listar_servicos_realizados(conn)
-        elif escolha == '5':
-            consultar_faturamento_mensal(conn)
         elif escolha == '6':
-            prompt = input("Faça sua pergunta: ")
+            print("\n--- Assistente Virtual ---")
+            print("Ex: 'Liste todos os clientes', 'Quantos veículos temos?', 'Mostre os agendamentos'")
+            prompt = input("Faça sua pergunta ao banco: ")
             perguntar_ao_banco_com_ia(prompt, conn)
         elif escolha == '0':
             break
@@ -138,48 +156,9 @@ def menu_relatorios(conn):
             print("Escolha inválida.")
 
 def menu_atualizacoes(conn):
-    while True:
-        print("\n--- Menu de Atualizações ---")
-        print("1. Atualizar Cadastro de Cliente")
-        print("2. Atualizar Cadastro de Mecânico")
-        print("0. Voltar ao Menu Principal")
-        escolha = input("Digite sua escolha: ")
-
-        if escolha == '1':
-            print("--- Atualizar Cliente ---")
-            listar_clientes(conn) 
-            try:
-                id_cli = int(input("Digite o ID do cliente que deseja alterar: "))
-                nome = input(f"Novo Nome (ID {id_cli}): ")
-                cpf = input(f"Novo CPF (ID {id_cli}): ")
-                endereco = input(f"Novo Endereço (ID {id_cli}): ")
-                telefone = input(f"Novo Telefone (ID {id_cli}): ")
-                
-                if id_cli and nome and cpf:
-                    atualizar_cliente(conn, id_cli, nome, cpf, endereco, telefone)
-                else:
-                    print("ID, Nome e CPF são obrigatórios.")
-            except ValueError:
-                print("ID inválido.")
-                
-        elif escolha == '2':
-            print("--- Atualizar Mecânico ---")
-            try:
-                id_mec = int(input("Digite o ID do mecânico que deseja alterar: "))
-                nome = input(f"Novo Nome (ID {id_mec}): ")
-                cargo = input(f"Novo Cargo (ID {id_mec}): ")
-                
-                if id_mec and nome and cargo:
-                    atualizar_mecanico(conn, id_mec, nome, cargo)
-                else:
-                    print("ID, Nome e Cargo são obrigatórios.")
-            except ValueError:
-                print("ID inválido.")
-                
-        elif escolha == '0':
-            break
-        else:
-            print("Escolha inválida.")
+    print("\nFuncionalidade de atualização precisa ser ajustada para a nova estrutura.")
+    print("Use o pgAdmin ou implemente as funções 'atualizar_*' no database.py primeiro.")
+    input("Pressione Enter para voltar...")
 
 if __name__ == "__main__":
     conn = None
@@ -192,7 +171,7 @@ if __name__ == "__main__":
                 while True:
                     print("\n--- MENU PRINCIPAL ---")
                     print("1. Cadastros")
-                    print("2. Relatórios")
+                    print("2. Relatórios / Consultas")
                     print("3. Atualizar Cadastros")
                     print("------------------------")
                     print("9. [Admin] Reiniciar Banco de Dados (APAGA TUDO)")
@@ -215,7 +194,7 @@ if __name__ == "__main__":
                         print("Opção inválida.")
         else:
             print("Não foi possível conectar ao banco de dados.")
-            print("Verifique se o PostgreSQL está rodando e se o banco 'oficina' existe.")
+            print("Verifique se o PostgreSQL está rodando e as credenciais no database.py.")
             
     except Exception as e:
         print(f"Ocorreu um erro crítico no programa: {e}")
