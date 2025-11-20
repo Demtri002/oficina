@@ -273,10 +273,70 @@ def menu_relatorios(conn):
             print("Escolha inválida.")
 
 def menu_atualizacoes(conn):
-    print("\nFuncionalidade de atualização precisa ser ajustada para a nova estrutura.")
+    print("1. Adicionar peça a um serviço.")
     print("Use o pgAdmin ou implemente as funções 'atualizar_*' no database.py primeiro.")
-    input("Pressione Enter para voltar...")
+    escolha = input("Digite sua escolha: ")
+    if escolha == '1':
+        print("\n--- Adicionar Peça a um Serviço ---")
+        listar_servicos_em_andamento(conn)
+        
+        id_servico = input("Digite o ID do Serviço (EM_ANDAMENTO): ")
+        listar_pecas(conn)
+        
+        id_peca = input("Digite o ID da Peça a ser adicionada: ")
+        quantidade = input("Quantidade: ")
+        
+        try:
+            vincular_servico_peca(conn, int(id_peca), int(id_servico), int(quantidade))
+        except ValueError:
+            print("IDs e Quantidade devem ser numéricos.")
+    
+def menu_delecoes(conn):
+    while True:
+        print("\n--- Menu de Deleções ---")
+        print("1. Deletar Clientes")
+        print("2. Deletar Veículos")
+        print("3. Deletar Agendamentos")
+        print("4. Deletar Mecânicos")
+        print("5. Deletar Fornecedores")
+        print("0. Voltar ao Menu Principal")
+        escolha = input("Digite sua escolha: ")
 
+        if escolha == '1':
+            listar_clientes(conn)
+            id_cliente = input("Digite o ID do Cliente a ser deletado: ")
+            confirmar = input(f"Tem certeza que deseja deletar o cliente {id_cliente}? (s/n): ")
+            if confirmar.lower() == 's':
+                deletar_cliente(conn, id_cliente)
+        elif escolha == '2':
+            listar_veiculos(conn)
+            id_veiculo = input("Digite o ID do Veículo a ser deletado: ")
+            confirmar = input(f"Tem certeza que deseja deletar o veículo {id_veiculo}? (s/n): ")
+            if confirmar.lower() == 's':
+                deletar_veiculo(conn, id_veiculo)
+        elif escolha == '3':
+            listar_agendamentos(conn)
+            id_agendamento = input("Digite o ID do Agendamento a ser deletado: ") 
+            confirmar = input(f"Tem certeza que deseja deletar o agendamento {id_agendamento}? (s/n): ")
+            if confirmar.lower() == 's':
+                deletar_agendamento(conn, id_agendamento)
+        elif escolha == '4':
+            listar_mecanicos(conn)
+            id_mecanico = input("Digite o ID do Mecânico a ser deletado: ")
+            confirmar = input(f"Tem certeza que deseja deletar o mecânico {id_mecanico}? (s/n): ")
+            if confirmar.lower() == 's':
+                deletar_mecanico(conn)
+        elif escolha == '5':
+            listar_fornecedores(conn)
+            id_fornecedor = input("Digite o ID do Fornecedor a ser deletado: ")
+            confirmar = input(f"Tem certeza que deseja deletar o fornecedor {id_fornecedor}? (s/n): ")
+            if confirmar.lower() == 's':
+                deletar_fornecedor(conn)
+        elif escolha == '0':
+            break
+        else:
+            print("Escolha inválida.")
+            
 if __name__ == "__main__":
     conn = None
     try:
@@ -290,6 +350,7 @@ if __name__ == "__main__":
                     print("1. Cadastros")
                     print("2. Relatórios / Consultas")
                     print("3. Atualizar Cadastros")
+                    print("4. Deletar Cadastros")
                     print("------------------------")
                     print("9. [Admin] Reiniciar Banco de Dados (APAGA TUDO)")
                     print("0. Sair do Sistema")
@@ -302,6 +363,8 @@ if __name__ == "__main__":
                         menu_relatorios(conn)
                     elif escolha_main == '3':
                         menu_atualizacoes(conn)
+                    elif escolha_main == '4':
+                        menu_delecoes(conn)
                     elif escolha_main == '9':
                         executar_setup_inicial(conn)
                     elif escolha_main == '0':

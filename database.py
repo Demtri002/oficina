@@ -7,7 +7,7 @@ def conecta():
     try:
         conn = psycopg2.connect(
             user="postgres",
-            password="1010", 
+            password="1234", 
             host="localhost",
             port="5432",
             database="oficina"
@@ -37,13 +37,15 @@ def criar_tabelas(conn):
             telefone CHAR(11),
             email VARCHAR(100),
             cpf CHAR(11),
-            endereco VARCHAR(200)
+            endereco VARCHAR(200),
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS fornecedor (
             id_fornecedor SERIAL PRIMARY KEY,
-            nome VARCHAR(100)
+            nome VARCHAR(100),
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
@@ -51,19 +53,22 @@ def criar_tabelas(conn):
             id_tiposervico SERIAL PRIMARY KEY,
             descricao VARCHAR(100),
             nome VARCHAR(100),
-            valor DECIMAL(10, 2) -- Preço padrão do serviço
+            valor DECIMAL(10, 2),
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS tipo_pagamento (
             id_tipopagamento SERIAL PRIMARY KEY,
-            cnpj VARCHAR(100)
+            cnpj VARCHAR(100),
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS Faturamento (
             id_faturamento SERIAL PRIMARY KEY,
-            valor_total INT
+            valor_total INT,
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
          """
@@ -72,7 +77,8 @@ def criar_tabelas(conn):
             nome VARCHAR(100),
             cargo VARCHAR(100),
             email VARCHAR(100),
-            fk_mecanico_id_mecanico INT
+            fk_mecanico_id_mecanico INT,
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
@@ -83,7 +89,8 @@ def criar_tabelas(conn):
             ano INT,
             modelo VARCHAR(100),
             fk_cliente_id_cliente INT,
-            placa char(7)
+            placa char(7),
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
@@ -91,14 +98,18 @@ def criar_tabelas(conn):
             id_peca SERIAL PRIMARY KEY,
             nome_peca VARCHAR(100),
             descricao_peca VARCHAR(100),
-            fk_fornecedor_id_fornecedor INT
+            fk_fornecedor_id_fornecedor INT,
+            valor_unit DECIMAL(10, 2),
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS agendamento (
             id_agendamento SERIAL PRIMARY KEY,
             data TIMESTAMP,
-            fk_veiculo_id_veiculo INT
+            fk_veiculo_id_veiculo INT,
+            status VARCHAR(20) DEFAULT 'ATIVO'
+            
         );
         """,
         """
@@ -115,7 +126,8 @@ def criar_tabelas(conn):
             id_item SERIAL PRIMARY KEY,
             fk_servico_id_servico INT,
             fk_tipo_servico_id_tiposervico INT,
-            valor_aplicado DECIMAL(10, 2)
+            valor_aplicado DECIMAL(10, 2),
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
@@ -127,20 +139,24 @@ def criar_tabelas(conn):
             cpf_na_nota CHAR(11),            
             fk_servico_id_servico INT,
             fk_tipo_pagamento_id_tipopagamento INT,
-            fk_Faturamento_id_faturamento INT
+            fk_Faturamento_id_faturamento INT,
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         
         """,
         """
         CREATE TABLE IF NOT EXISTS servico_peca (
             fk_peca_id_peca INT,
-            fk_servico_id_servico INT
+            fk_servico_id_servico INT,
+            quantidade INT DEFAULT 1,
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS mecanico_servico (
             fk_mecanico_id_mecanico INT,
-            fk_servico_id_servico INT
+            fk_servico_id_servico INT,
+            status VARCHAR(20) DEFAULT 'ATIVO'
         );
         """,
       
@@ -288,9 +304,7 @@ def criar_tabelas(conn):
             cur.close()
 
 def inserir_dados_iniciais(conn):
-    """
-    Popula o banco de dados com dados de teste (Seed).
-    """
+
     commands = [
         # 1. CLIENTES
         """
@@ -341,9 +355,9 @@ def inserir_dados_iniciais(conn):
 
         # 7. PEÇAS (Vinculadas aos Fornecedores 1 e 2)
         """
-        INSERT INTO peca (nome_peca, descricao_peca, fk_fornecedor_id_fornecedor) VALUES 
-        ('Filtro de Óleo', 'Filtro padrão universal', 1),
-        ('Pastilha de Freio', 'Cerâmica', 2);
+        INSERT INTO peca (nome_peca, descricao_peca, fk_fornecedor_id_fornecedor, valor_unit) VALUES 
+        ('Filtro de Óleo', 'Filtro padrão universal', 1, 100.00),
+        ('Pastilha de Freio', 'Cerâmica', 2, 200.00);
         """,
 
         # 8. AGENDAMENTOS (Para os veículos criados)
@@ -605,18 +619,16 @@ def cadastrar_agendamento(conn, data_hora, placa):
         return None
 
 
-
-
-def vincular_servico_peca(conn, id_peca, id_servico):
+def vincular_servico_peca(conn, id_peca, id_servico, quantidade=1):
     sql = """
-        INSERT INTO servico_peca (fk_peca_id_peca, fk_servico_id_servico)
-        VALUES (%s, %s);
+        INSERT INTO servico_peca (fk_peca_id_peca, fk_servico_id_servico, quantidade)
+        VALUES (%s, %s, %s);
     """
     try:
         with conn.cursor() as cur:
-            cur.execute(sql, (id_peca, id_servico))
+            cur.execute(sql, (id_peca, id_servico, quantidade))
         conn.commit()
-        print(f" Peça ID {id_peca} vinculada ao Serviço ID {id_servico}.")
+        print(f"{quantidade} unidade(s) da peça ID {id_peca} foi vinculada ao Serviço ID {id_servico}.")
     except DatabaseError as e:
         conn.rollback()
         print(f" Erro ao vincular peça ao serviço: {e}")
@@ -637,19 +649,22 @@ def vincular_mecanico_servico(conn, id_mecanico, id_servico):
         print(f" Erro ao vincular mecânico ao serviço: {e}")
 
 def listar_clientes(conn):
-    sql = "SELECT id_cliente, nome, telefone, email, cpf, endereco FROM cliente ORDER BY id_cliente;"
+    sql = "SELECT id_cliente, nome, telefone, email, cpf, endereco FROM cliente WHERE status = 'ATIVO' ORDER BY id_cliente;"
     try:
         with conn.cursor() as cur:
             cur.execute(sql)
             clientes = cur.fetchall()
-            print("\n--- Lista de Clientes ---")
+            print("\n--- Lista de Clientes --------------------------------------------------------------------------------------------------")
+            print("{:<5} | {:<30} | {:<11} | {:<30} | {:<11} | {:<30}".format("ID", "Nome", "Telefone", "Email", "CPF", "Endereço"))
+            print("-" * 120)
             for cliente in clientes:
-                print(f"ID: {cliente[0]}, Nome: {cliente[1]}, Telefone: {cliente[2]}, Email: {cliente[3]}, CPF: {cliente[4]}, Endereço: {cliente[5]}")
+                print("{:<5} | {:<30} | {:<11} | {:<30} | {:<11} | {:<30}".format(cliente[0], cliente[1], cliente[2], cliente[3], cliente[4], cliente[5]))
+                print("-" * 120)
     except DatabaseError as e:
         print(f" Erro ao listar clientes: {e}")
 
 def listar_veiculos(conn):
-    sql = "SELECT id_veiculo, marca, modelo, placa, ano, cor, fk_cliente_id_cliente FROM veiculo ORDER BY id_veiculo;"
+    sql = "SELECT id_veiculo, marca, modelo, placa, ano, cor, fk_cliente_id_cliente FROM veiculo WHERE status = 'ATIVO' ORDER BY id_veiculo;"
     try:
         with conn.cursor() as cur:
             cur.execute(sql)
@@ -662,9 +677,24 @@ def listar_veiculos(conn):
                 print("-" * 85)
     except DatabaseError as e:
         print(f" Erro ao listar veículos: {e}")
+        
+def listar_pecas(conn):
+    sql = "SELECT id_peca, nome_peca, descricao_peca, fk_fornecedor_id_fornecedor, valor_unit FROM peca WHERE status = 'ATIVO' ORDER BY id_peca;"
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            pecas = cur.fetchall()
+            print("\n--- Lista de Peças ---------------------------------------------------------------")
+            print("{:<5} | {:<15} | {:<20} | {:<5} | {:<7}".format("ID", "Nome", "Descrição", "ID Fornecedor", "Valor Unitário"))
+            print("-" * 85)
+            for peca in pecas:
+                print("{:<5} | {:<15} | {:<20} | {:<5} | {:<7}".format(peca[0], peca[1], peca[2], peca[3], peca[4]))
+                print("-" * 85)
+    except DatabaseError as e:
+        print(f" Erro ao listar peças: {e}")
 
 def listar_mecanicos(conn):
-    sql = "SELECT id_mecanico, nome, cargo, email, fk_mecanico_id_mecanico FROM mecanico ORDER BY id_mecanico;"
+    sql = "SELECT id_mecanico, nome, cargo, email, fk_mecanico_id_mecanico FROM mecanico WHERE status = 'ATIVO' ORDER BY id_mecanico;"
     try:
         with conn.cursor() as cur:
             cur.execute(sql)
@@ -679,7 +709,7 @@ def listar_mecanicos(conn):
         print(f" Erro ao listar mecânicos: {e}")
 
 def listar_fornecedores(conn):
-    sql = "SELECT id_fornecedor, nome FROM fornecedor ORDER BY id_fornecedor;"
+    sql = "SELECT id_fornecedor, nome FROM fornecedor WHERE status = 'ATIVO' ORDER BY id_fornecedor;"
     try:
         with conn.cursor() as cur:
             cur.execute(sql)
@@ -694,19 +724,36 @@ def listar_fornecedores(conn):
         print(f" Erro ao listar fornecedores: {e}")
 
 def listar_agendamentos(conn):
-    sql = "SELECT id_agendamento, data, fk_veiculo_id_veiculo FROM agendamento ORDER BY id_agendamento;"
+    sql = """
+        SELECT id_agendamento, data, fk_veiculo_id_veiculo 
+        FROM agendamento 
+        WHERE status = 'ATIVO' OR status IS NULL OR status = 'ABERTO' 
+        ORDER BY id_agendamento;
+    """
     try:
         with conn.cursor() as cur:
             cur.execute(sql)
             agendamentos = cur.fetchall()
-            print("\n--- Lista de Agendamentos ---")
-            print("{:<5} | {:<10} | {:<5}".format("ID", "Data", "ID Veículo"))
-            print("-" * 30)
+            
+            print("\n--- Lista de Agendamentos ATIVOS ---")
+            print("{:<5} | {:<20} | {:<5}".format("ID", "Data", "ID Veículo"))
+            print("-" * 35)
+            
+            if not agendamentos:
+                print("Nenhum agendamento ativo encontrado.")
+                print("-" * 35)
+                return []
+                
             for agendamento in agendamentos:
-                print("{:<5} | {:<10} | {:<5}".format(agendamento[0], agendamento[1], agendamento[2]))
-                print("-" * 30)
+                data_formatada = agendamento[1].strftime("%Y-%m-%d %H:%M")
+                print("{:<5} | {:<20} | {:<5}".format(agendamento[0], data_formatada, agendamento[2]))
+                print("-" * 35)
+            
+            return agendamentos
+            
     except DatabaseError as e:
         print(f" Erro ao listar agendamentos: {e}")
+        return []
 
 def buscar_agendamento_detalhado(conn, id_agendamento):
     sql = """
@@ -730,13 +777,20 @@ def abrir_ordem_servico(conn, id_agendamento, descricao):
         VALUES (%s, %s)
         RETURNING id_servico;
     """
+    
+    sql_update_agendamento = """
+        UPDATE agendamento 
+        SET status = 'CANCELADO' 
+        WHERE id_agendamento = %s;
+    """
     try:
         with conn.cursor() as cur:
             cur.execute(sql, (id_agendamento, descricao))
             id_gerado = cur.fetchone()[0]
-        conn.commit()
-        print(f" Ordem de Serviço #{id_gerado} aberta!")
-        return id_gerado
+            cur.execute(sql_update_agendamento, (id_agendamento,))
+            conn.commit()
+            print(f" Ordem de Serviço #{id_gerado} aberta!")
+            return id_gerado
     except DatabaseError as e:
         conn.rollback()
         print(f" Erro ao abrir serviço: {e}")
@@ -861,7 +915,9 @@ def finalizar_servico_gerar_nf(conn, id_servico):
             sql_consulta = """
                 SELECT 
                     c.cpf,
-                    SUM(i.valor_aplicado) as total_servico
+                    SUM(COALESCE(i.valor_aplicado, 0) + 
+                    COALESCE(p.valor_unit, 0)
+                    ) as total_servico
                 FROM servico s
                 -- O Serviço está ligado ao Agendamento
                 JOIN agendamento a ON s.fk_agendamento_id_agendamento = a.id_agendamento
@@ -871,6 +927,8 @@ def finalizar_servico_gerar_nf(conn, id_servico):
                 JOIN cliente c ON v.fk_cliente_id_cliente = c.id_cliente
                 -- Pegamos os itens do serviço para somar
                 LEFT JOIN itens_servico i ON i.fk_servico_id_servico = s.id_servico
+                LEFT JOIN servico_peca sp ON sp.fk_servico_id_servico = s.id_servico 
+                LEFT JOIN peca p ON sp.fk_peca_id_peca = p.id_peca
                 WHERE s.id_servico = %s
                 GROUP BY c.cpf;
             """
@@ -879,7 +937,7 @@ def finalizar_servico_gerar_nf(conn, id_servico):
             res = cur.fetchone()
             
             if not res:
-                print(" Erro: Serviço não encontrado ou cadeia de relacionamentos (Agendamento/Veículo/Cliente) quebrada.")
+                print(" Erro: Serviço não encontrado.")
                 return False
             
             cpf_cliente, valor_total = res
@@ -891,23 +949,40 @@ def finalizar_servico_gerar_nf(conn, id_servico):
                 print(" Aviso: Cliente sem CPF cadastrado.")
                 cpf_cliente = None 
 
-          
             sql_insert_nf = """
                 INSERT INTO nota_fiscal (fk_servico_id_servico, cpf_na_nota, valor_pagamento, data_emissao)
                 VALUES (%s, %s, %s, CURRENT_DATE)
                 RETURNING id_notafiscal;
             """
-            
-            
             cur.execute(sql_insert_nf, (id_servico, cpf_cliente, valor_total))
             id_nova_nf = cur.fetchone()[0]
-
-            
             conn.commit()
+            
+            sql_pecas_usadas = """
+                SELECT 
+                    p.nome_peca,
+                    sp.quantidade,
+                    p.valor_unit
+                FROM servico_peca sp
+                JOIN peca p ON sp.fk_peca_id_peca = p.id_peca
+                WHERE sp.fk_servico_id_servico = %s;
+            """
+            cur.execute(sql_pecas_usadas, (id_servico,))
+            pecas_usadas = cur.fetchall()
+            
             print(f" Serviço Finalizado com Sucesso!")
             print(f" Nota Fiscal Gerada: ID {id_nova_nf}")
             print(f" CPF na Nota: {cpf_cliente}")
             print(f" Valor Total: R$ {valor_total:.2f}")
+            
+            if pecas_usadas:
+                print("\n--- DETALHES DAS PEÇAS ---")
+                for nome, qtd, valor_unit in pecas_usadas: 
+                    print(f" |-> {nome}: {qtd} unidade(s) (R$ {valor_unit:.2f} / un)")
+                print("--------------------------")
+            else:
+                print("\n--- Nenhuma peça foi utilizada neste serviço. ---")
+            print("==================================")
             return True
 
     except DatabaseError as e:
@@ -1021,3 +1096,117 @@ def listar_servicos_finalizados(conn):
     except DatabaseError as e:
         print(f" Erro ao listar serviços: {e}")
         return []
+    
+def deletar_cliente(conn, id_cliente):
+    # SQL 1: Inativa o cliente
+    sql_cliente = "UPDATE cliente SET status = 'INATIVO' WHERE id_cliente = %s AND status = 'ATIVO';"
+    
+    # SQL 2: Propaga a inativação para os veículos relacionados
+    sql_propagar_veiculos = "UPDATE veiculo SET status = 'INATIVO' WHERE fk_cliente_id_cliente = %s AND status = 'ATIVO';"
+
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql_cliente, (id_cliente,))
+            if cur.rowcount > 0:
+                cur.execute(sql_propagar_veiculos, (id_cliente,))
+                num_veiculos_afetados = cur.rowcount
+        
+                conn.commit()
+                
+                print(f"Cliente ID {id_cliente} DELETADO.")
+                print(f"{num_veiculos_afetados} veículo(s) relacionado(s) também foram DELETADOS.")
+                return True
+            else:
+                print(f" Cliente ID {id_cliente} não encontrado ou já foi DELETADO.")
+                return False
+                
+    except DatabaseError as e:
+        conn.rollback()
+        print(f" Erro ao deletar cliente e propagar: {e}")
+        return False
+    
+def deletar_veiculo(conn, id_veiculo):
+    sql = "UPDATE veiculo SET status = 'INATIVO' WHERE id_veiculo = %s AND status = 'ATIVO';"
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (id_veiculo,))
+            if cur.rowcount > 0:
+                conn.commit()
+                print(f" Veículo ID {id_veiculo} marcado como INATIVO.")
+                return True
+            else:
+                print(f" Veículo ID {id_veiculo} não encontrado ou já está INATIVO.")
+                return False
+    except DatabaseError as e:
+        conn.rollback()
+        print(f" Erro ao deletar veículo: {e}")
+        return False
+    
+def deletar_peca(conn, id_peca):
+    sql = "UPDATE peca SET status = 'INATIVO' WHERE id_peca = %s AND status = 'ATIVO';"
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (id_peca,))
+            if cur.rowcount > 0:
+                conn.commit()
+                print(f" Peça ID {id_peca} marcada como INATIVA.")
+                return True
+            else:
+                print(f" Peça ID {id_peca} não encontrada ou já está INATIVA.")
+                return False
+    except DatabaseError as e:
+        conn.rollback()
+        print(f" Erro ao deletar peça: {e}")
+        return False
+    
+def deletar_mecanico(conn, id_mecanico):
+    sql = "UPDATE mecanico SET status = 'INATIVO' WHERE id_mecanico = %s AND status = 'ATIVO';"
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (id_mecanico,))
+            if cur.rowcount > 0:
+                conn.commit()
+                print(f" Mecânico ID {id_mecanico} marcado como INATIVO.")
+                return True
+            else:
+                print(f" Mecânico ID {id_mecanico} não encontrado ou já está INATIVO.")
+                return False
+    except DatabaseError as e:
+        conn.rollback()
+        print(f" Erro ao deletar mecânico: {e}")
+        return False
+
+def deletar_fornecedor(conn, id_fornecedor):
+    sql = "UPDATE fornecedor SET status = 'INATIVO' WHERE id_fornecedor = %s AND status = 'ATIVO';"
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (id_fornecedor,))
+            if cur.rowcount > 0:
+                conn.commit()
+                print(f" Fornecedor ID {id_fornecedor} marcado como INATIVO.")
+                return True
+            else:
+                print(f" Fornecedor ID {id_fornecedor} não encontrado ou já está INATIVO.")
+                return False
+    except DatabaseError as e:
+        conn.rollback()
+        print(f" Erro ao deletar fornecedor: {e}")
+        return False
+    
+def deletar_agendamento(conn, id_agendamento):
+    sql = "UPDATE agendamento SET status = 'CANCELADO' WHERE id_agendamento = %s AND (status = 'ATIVO' OR status IS NULL OR status = 'ABERTO');"
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (id_agendamento,))
+            if cur.rowcount > 0:
+                conn.commit()
+                print(f" Agendamento ID {id_agendamento} marcado como CANCELADO.")
+                return True
+            else:
+                print(f" Agendamento ID {id_agendamento} não encontrado ou não pode ser cancelado.")
+                return False
+    except DatabaseError as e:
+        conn.rollback()
+        print(f" Erro ao deletar agendamento: {e}")
+        return False
+    
