@@ -16,7 +16,7 @@ def cadastrar_peca(conn, nome_peca, descricao_peca, id_fornecedor, valor_unit=No
         return id_gerado
     except DatabaseError as e:
         conn.rollback()
-        print(f"❌ Erro ao cadastrar peça: {e}")
+        print(f"Erro ao cadastrar peça: {e}")
         return None
 
 def listar_pecas(conn):

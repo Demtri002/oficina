@@ -303,37 +303,27 @@ def criar_tabelas(conn):
 
 def inserir_dados_iniciais(conn):
     commands = [
-        # 1. CLIENTES
         """
         INSERT INTO cliente (nome, telefone, email, cpf, endereco) VALUES 
         ('João Silva', '11999999999', 'joao@email.com', '11122233344', 'Rua das Flores, 123'),
         ('Maria Oliveira', '21988888888', 'maria@email.com', '55566677788', 'Av. Paulista, 900');
         """,
-        
-        # 2. FORNECEDORES
         """
         INSERT INTO fornecedor (nome) VALUES 
         ('Auto Peças Brasil'),
         ('Distribuidora Mecânica Total');
         """,
-        
-        # 3. TIPOS DE SERVIÇO
         """
         INSERT INTO tipo_servico (nome, descricao, valor) VALUES 
         ('Troca de Óleo', 'Troca de óleo do motor e filtro', 150.00),
         ('Alinhamento', 'Alinhamento e balanceamento das rodas', 120.00),
         ('Revisão Completa', 'Verificação geral de freios, suspensão e motor', 450.00);
         """,
-        
-        # 4. TIPOS DE PAGAMENTO
         """
         INSERT INTO tipo_pagamento (cnpj) VALUES 
-        ('00.000.000/0001-99'), -- Ex: Máquina de Cartão
-        ('11.111.111/0001-11');  -- Ex: Transferência Bancária
+        ('00.000.000/0001-99'),
+        ('11.111.111/0001-11');
         """,
-        
-        # 5. MECÂNICOS
-        # O primeiro é o Chefe (Supervisor NULL), o segundo é supervisionado pelo ID 1
         """
         INSERT INTO mecanico (nome, cargo, email, fk_mecanico_id_mecanico) VALUES 
         ('Carlos Mestre', 'Chefe de Oficina', 'carlos@oficina.com', NULL);
@@ -342,39 +332,29 @@ def inserir_dados_iniciais(conn):
         INSERT INTO mecanico (nome, cargo, email, fk_mecanico_id_mecanico) VALUES 
         ('Pedro Aprendiz', 'Auxiliar', 'pedro@oficina.com', 1); 
         """,
-
-        # 6. VEÍCULOS (Vinculados aos Clientes 1 e 2)
         """
         INSERT INTO veiculo (marca, modelo, ano, cor, placa, fk_cliente_id_cliente) VALUES 
         ('Fiat', 'Uno', 2010, 'Prata', 'ABC1234', 1),
         ('Toyota', 'Corolla', 2022, 'Preto', 'XYZ9876', 2);
         """,
-
-        # 7. PEÇAS (Vinculadas aos Fornecedores 1 e 2)
         """
         INSERT INTO peca (nome_peca, descricao_peca, fk_fornecedor_id_fornecedor, valor_unit) VALUES 
         ('Filtro de Óleo', 'Filtro padrão universal', 1, 100.00),
         ('Pastilha de Freio', 'Cerâmica', 2, 200.00);
         """,
-
-        # 8. AGENDAMENTOS (Para os veículos criados)
         """
         INSERT INTO agendamento (data, fk_veiculo_id_veiculo) VALUES 
-        ('2025-12-01 08:00:00', 1), -- Agendamento para o Uno
-        ('2025-12-02 14:00:00', 2); -- Agendamento para o Corolla
+        ('2025-12-01 08:00:00', 1),
+        ('2025-12-02 14:00:00', 2);
         """,
-
-        # 9. SERVIÇOS (Vinculados aos Agendamentos)
         """
         INSERT INTO servico (descricao, fk_agendamento_id_agendamento) VALUES 
         ('Cliente relatou barulho no motor', 1);
         """,
-
-        # 10. ITENS DO SERVIÇO (Vincula o Serviço 1 aos Tipos de Serviço 1 e 3)
         """
         INSERT INTO itens_servico (fk_servico_id_servico, fk_tipo_servico_id_tiposervico, valor_aplicado) VALUES 
-        (1, 1, 150.00), -- Troca de óleo no serviço 1
-        (1, 3, 450.00); -- Revisão completa no serviço 1
+        (1, 1, 150.00),
+        (1, 3, 450.00);
         """
     ]
 

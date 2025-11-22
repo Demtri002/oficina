@@ -57,7 +57,7 @@ def iniciar_servico(conn, id_servico):
                 return False
     except DatabaseError as e:
         conn.rollback()
-        print(f"❌ Erro ao iniciar serviço: {e}")
+        print(f"Erro ao iniciar serviço: {e}")
         return False
 
 def adicionar_item_servico(conn, id_servico, id_tipo_servico):
