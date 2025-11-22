@@ -1,0 +1,142 @@
+
+from .connection import (
+    conecta,
+    encerra_conexao,
+    criar_tabelas,
+    inserir_dados_iniciais,
+    eliminar_tabelas
+)
+
+from .cliente import (
+    cadastrar_cliente,
+    listar_clientes,
+    atualizar_cliente,
+    deletar_cliente,
+    buscar_cliente_por_id
+)
+
+from .veiculo import (
+    cadastrar_veiculo,
+    listar_veiculos,
+    atualizar_veiculo,
+    deletar_veiculo,
+    buscar_veiculo_por_id
+)
+
+from .agendamento import (
+    cadastrar_agendamento,
+    listar_agendamentos,
+    buscar_agendamento_detalhado,
+    atualizar_agendamento,
+    deletar_agendamento,
+    buscar_agendamento_por_id
+)
+
+from .mecanico import (
+    cadastrar_mecanico,
+    listar_mecanicos,
+    atualizar_mecanico,
+    deletar_mecanico,
+    buscar_mecanico_por_id,
+    vincular_mecanico_servico
+)
+
+from .fornecedor import (
+    cadastrar_fornecedor,
+    listar_fornecedores,
+    atualizar_fornecedor,
+    deletar_fornecedor,
+    buscar_fornecedor_por_id
+)
+
+from .tipo_servico import (
+    cadastrar_tipo_servico,
+    listar_servicos_simples,
+    atualizar_tipo_servico,
+    buscar_tipo_servico_por_id
+)
+
+from .peca import (
+    cadastrar_peca,
+    listar_pecas,
+    atualizar_peca,
+    deletar_peca,
+    buscar_peca_por_id,
+    vincular_servico_peca
+)
+
+from .servico import (
+    cadastrar_servico,
+    abrir_ordem_servico,
+    iniciar_servico,
+    adicionar_item_servico,
+    calcular_valor_total_servico,
+    listar_servicos_em_andamento,
+    listar_servicos_finalizados
+)
+
+from .nota_fiscal import (
+    cadastrar_nota_fiscal,
+    finalizar_servico_gerar_nf,
+    consultar_faturamento_por_periodo,
+    adicionar_nota_fiscal,
+    cadastrar_tipo_pagamento
+)
+
+__all__ = [
+    'conecta',
+    'encerra_conexao',
+    'criar_tabelas',
+    'inserir_dados_iniciais',
+    'eliminar_tabelas',
+    'cadastrar_cliente',
+    'listar_clientes',
+    'atualizar_cliente',
+    'deletar_cliente',
+    'buscar_cliente_por_id',
+    'cadastrar_veiculo',
+    'listar_veiculos',
+    'atualizar_veiculo',
+    'deletar_veiculo',
+    'buscar_veiculo_por_id',
+    'cadastrar_agendamento',
+    'listar_agendamentos',
+    'buscar_agendamento_detalhado',
+    'atualizar_agendamento',
+    'deletar_agendamento',
+    'buscar_agendamento_por_id',
+    'cadastrar_mecanico',
+    'listar_mecanicos',
+    'atualizar_mecanico',
+    'deletar_mecanico',
+    'buscar_mecanico_por_id',
+    'vincular_mecanico_servico',
+    'cadastrar_fornecedor',
+    'listar_fornecedores',
+    'atualizar_fornecedor',
+    'deletar_fornecedor',
+    'buscar_fornecedor_por_id',
+    'cadastrar_tipo_servico',
+    'listar_servicos_simples',
+    'atualizar_tipo_servico',
+    'buscar_tipo_servico_por_id',
+    'cadastrar_peca',
+    'listar_pecas',
+    'atualizar_peca',
+    'deletar_peca',
+    'buscar_peca_por_id',
+    'vincular_servico_peca',
+    'cadastrar_servico',
+    'abrir_ordem_servico',
+    'iniciar_servico',
+    'adicionar_item_servico',
+    'calcular_valor_total_servico',
+    'listar_servicos_em_andamento',
+    'listar_servicos_finalizados',
+    'cadastrar_nota_fiscal',
+    'finalizar_servico_gerar_nf',
+    'consultar_faturamento_por_periodo',
+    'adicionar_nota_fiscal',
+    'cadastrar_tipo_pagamento',
+]
+

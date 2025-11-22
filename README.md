@@ -1,3 +1,79 @@
+# Sistema de Gerenciamento de Oficina
+
+Sistema de gerenciamento completo para oficinas mecânicas com integração de IA (Google Gemini).
+
+## 📋 Pré-requisitos
+
+- Python 3.8 ou superior
+- PostgreSQL instalado e rodando
+- Banco de dados `oficina` criado no PostgreSQL
+
+## 🚀 Instalação
+
+### 1. Clone o repositório (se aplicável)
+```bash
+cd oficina
+```
+
+### 2. Crie e ative o ambiente virtual
+```bash
+python3 -m venv venv
+source venv/bin/activate  # No Linux/Mac
+# ou
+venv\Scripts\activate  # No Windows
+```
+
+### 3. Instale as dependências
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure o banco de dados
+
+Edite o arquivo `db/connection.py` com suas credenciais do PostgreSQL:
+```python
+conn = psycopg2.connect(
+    user="postgres",
+    password="sua_senha",
+    host="localhost",
+    port="5432",
+    database="oficina"
+)
+```
+
+### 5. Execute o sistema
+```bash
+python main.py
+```
+
+## 📦 Dependências
+
+- `psycopg2-binary` - Driver PostgreSQL para Python
+- `google-genai` - SDK do Google Gemini para integração com IA
+
+## 📁 Estrutura do Projeto
+
+```
+oficina/
+├── db/                    # Módulos de banco de dados
+│   ├── connection.py     # Conexão e criação de tabelas
+│   ├── cliente.py        # Operações com clientes
+│   ├── veiculo.py        # Operações com veículos
+│   ├── agendamento.py    # Operações com agendamentos
+│   ├── mecanico.py       # Operações com mecânicos
+│   ├── fornecedor.py    # Operações com fornecedores
+│   ├── tipo_servico.py  # Operações com tipos de serviço
+│   ├── peca.py          # Operações com peças
+│   ├── servico.py        # Operações com serviços
+│   └── nota_fiscal.py   # Operações com notas fiscais
+├── main.py               # Interface principal do sistema
+├── database.py           # Wrapper de compatibilidade
+├── ai_integration.py     # Integração com Google Gemini
+├── requirements.txt      # Dependências do projeto
+└── README.md            # Este arquivo
+```
+
+## 🗄️ Estrutura do Banco de Dados
 
 #  Tabela cliente
 create table clientes(
