@@ -1,16 +1,6 @@
 from database import *
 from ai_integration import perguntar_ao_banco_com_ia
 
-def login_mecanico():
-    print("--- Sistema de Gerenciamento da Oficina ---")
-    nome = input("Digite seu nome (Mecânico/Admin) para logar: ")
-    if not nome:
-        print("Login inválido.")
-        return False
-        
-    print(f"Bem-vindo, {nome}!")
-    return True
-
 
 def executar_setup_inicial(conn):
     print("--- ATENÇÃO: MODO ADMIN ---")
@@ -296,6 +286,7 @@ def menu_atualizacoes(conn):
         print("5. Atualizar Fornecedor")
         print("6. Atualizar Tipo de Serviço")
         print("7. Atualizar Peça")
+        print("8. Adicionar Peça a um Serviço")
         print("0. Voltar ao Menu Principal")
         escolha = input("Digite sua escolha: ")
 
@@ -506,7 +497,24 @@ def menu_atualizacoes(conn):
                 print(" Erro: ID ou Valor deve ser um número.")
             except Exception as e:
                 print(f" Erro: {e}")
+        elif escolha == '8':
+            print("\n--- Adicionar Peça a um Serviço ---")
+            listar_servicos_em_andamento(conn)
+            try:
+                id_servico = int(input("Digite o ID do Serviço (EM_ANDAMENTO): "))
+                listar_pecas(conn)
+                id_peca = int(input("Digite o ID da Peça a ser adicionada: "))
+                quantidade_input = input("Quantidade (padrão 1): ").strip()
+                quantidade = int(quantidade_input) if quantidade_input else 1
                 
+                if quantidade <= 0:
+                    print(" Quantidade deve ser maior que zero.")
+                    continue
+                adicionar_peca_servico(conn, id_servico, id_peca, quantidade)
+            except ValueError:
+                print(" Erro: IDs ou Quantidade devem ser números.")
+            except Exception as e:
+                print(f" Erro: {e}")        
         elif escolha == '0':
             break
         else:
@@ -565,7 +573,8 @@ if __name__ == "__main__":
         if conn:
             criar_tabelas(conn) 
             
-            if login_mecanico():
+            if login_mecanico(conn, email = input("Email: "), senha = input("Senha: ")):
+                print("Login bem-sucedido.")
                 while True:
                     print("\n--- MENU PRINCIPAL ---")
                     print("1. Cadastros")

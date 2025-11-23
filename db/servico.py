@@ -160,4 +160,20 @@ def listar_servicos_finalizados(conn):
     except DatabaseError as e:
         print(f" Erro ao listar serviços: {e}")
         return []
+    
+def adicionar_peca_servico(conn, id_servico, id_peca, quantidade):
+    sql = """
+        INSERT INTO servico_peca (fk_servico_id_servico, fk_peca_id_peca, quantidade)
+        VALUES (%s, %s, %s);
+    """
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (id_servico, id_peca, quantidade))
+        conn.commit()
+        print(f" Peça ID {id_peca} adicionada ao serviço ID {id_servico} (Quantidade: {quantidade}).")
+        return True
+    except DatabaseError as e:
+        conn.rollback()
+        print(f" Erro ao adicionar peça ao serviço: {e}")
+        return False
 

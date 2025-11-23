@@ -38,7 +38,8 @@ from .mecanico import (
     atualizar_mecanico,
     deletar_mecanico,
     buscar_mecanico_por_id,
-    vincular_mecanico_servico
+    vincular_mecanico_servico,
+    login_mecanico
 )
 
 from .fornecedor import (
@@ -72,7 +73,8 @@ from .servico import (
     adicionar_item_servico,
     calcular_valor_total_servico,
     listar_servicos_em_andamento,
-    listar_servicos_finalizados
+    listar_servicos_finalizados,
+    adicionar_peca_servico
 )
 
 from .nota_fiscal import (
@@ -147,5 +149,7 @@ __all__ = [
     'consulta1_faturamento_por_tipo_servico',
     'consulta2_quantidade_servicos_por_cliente',
     'consulta3_valor_pecas_por_fornecedor',
+    'adicionar_peca_servico',
+    'login_mecanico',
 ]
 

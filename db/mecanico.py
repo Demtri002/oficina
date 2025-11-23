@@ -1,14 +1,38 @@
 from psycopg2 import DatabaseError
 
-def cadastrar_mecanico(conn, nome, cargo, email, id_supervisor=None):
+def login_mecanico(conn, email, senha):
     sql = """
-        INSERT INTO mecanico (nome, cargo, email, fk_mecanico_id_mecanico)
-        VALUES (%s, %s, %s, %s)
+        SELECT id_mecanico, nome, cargo 
+        FROM mecanico 
+        WHERE email = %s AND senha = %s
+    """
+    
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (email, senha))
+            resultado = cur.fetchone()
+
+            if resultado:
+                return {
+                    "id": resultado[0],
+                    "nome": resultado[1],
+                    "cargo": resultado[2]
+                }
+            else:
+                return None
+    except Exception as e:
+        print(f"Erro na autenticação: {e}")
+        return None
+
+def cadastrar_mecanico(conn, nome, cargo, email, senha, id_supervisor=None):
+    sql = """
+        INSERT INTO mecanico (nome, cargo, email, senha, fk_mecanico_id_mecanico)
+        VALUES (%s, %s, %s, %s, %s)
         RETURNING id_mecanico;
     """
     try:
         with conn.cursor() as cur:
-            cur.execute(sql, (nome, cargo, email, id_supervisor))
+            cur.execute(sql, (nome, cargo, email, senha, id_supervisor))
             id_gerado = cur.fetchone()[0]
         conn.commit()
         print(f" Mecânico '{nome}' cadastrado. ID: {id_gerado}")
@@ -25,15 +49,17 @@ def listar_mecanicos(conn):
             cur.execute(sql)
             mecanicos = cur.fetchall()
             print("\n--- Lista de Mecânicos ---")
-            print("{:<5} | {:<30} | {:<15} | {:<40} | {:<5}".format("ID", "Nome", "Cargo", "Email", "ID Supervisor"))
-            print("-" * 60)
+            print("{:<5} | {:<25} | {:<30} | {:<40} | {:<5}".format("ID", "Nome", "Cargo", "Email", "ID Supervisor"))
+            print("-" * 110)
             for mecanico in mecanicos:
-                print("{:<5} | {:<30} | {:<15} | {:<40} | {:<5}".format(mecanico[0], mecanico[1], mecanico[2], mecanico[3], mecanico[4]))
-                print("-" * 60)
+                id_supervisor = mecanico[4]
+                id_supervisor_formatado = id_supervisor if id_supervisor is not None else ""
+                print("{:<5} | {:<25} | {:<30} | {:<40} | {:<5}".format(mecanico[0], mecanico[1], mecanico[2], mecanico[3], id_supervisor_formatado))
+                print("-" * 110)
     except DatabaseError as e:
         print(f" Erro ao listar mecânicos: {e}")
 
-def atualizar_mecanico(conn, id_mecanico, nome=None, cargo=None, email=None, id_supervisor=None):
+def atualizar_mecanico(conn, id_mecanico, nome=None, cargo=None, email=None, senha=None, id_supervisor=None):
     campos = []
     valores = []
     
@@ -46,6 +72,9 @@ def atualizar_mecanico(conn, id_mecanico, nome=None, cargo=None, email=None, id_
     if email is not None:
         campos.append("email = %s")
         valores.append(email)
+    if senha is not None:
+        campos.append("senha = %s")
+        valores.append(senha)
     if id_supervisor is not None:
         if id_supervisor == '':
             campos.append("fk_mecanico_id_mecanico = NULL")

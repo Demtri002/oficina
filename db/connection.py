@@ -6,7 +6,7 @@ def conecta():
     try:
         conn = psycopg2.connect(
             user="postgres",
-            password="1010", 
+            password="1234", 
             host="localhost",
             port="5432",
             database="oficina"
@@ -75,6 +75,7 @@ def criar_tabelas(conn):
             nome VARCHAR(100),
             cargo VARCHAR(100),
             email VARCHAR(100),
+            senha VARCHAR(100),
             fk_mecanico_id_mecanico INT,
             status VARCHAR(20) DEFAULT 'ATIVO'
         );
@@ -340,13 +341,13 @@ def inserir_dados_iniciais(conn):
         ('55.555.555/0001-55');
         """,
         """
-        INSERT INTO mecanico (nome, cargo, email, fk_mecanico_id_mecanico) VALUES 
-        ('Carlos Mestre', 'Chefe de Oficina', 'carlos@oficina.com', NULL),
-        ('Pedro Aprendiz', 'Auxiliar', 'pedro@oficina.com', 1),
-        ('Roberto Silva', 'Mecânico Especialista', 'roberto@oficina.com', 1),
-        ('Fernando Costa', 'Mecânico', 'fernando@oficina.com', 1),
-        ('Lucas Alves', 'Auxiliar', 'lucas@oficina.com', 1),
-        ('Marcos Oliveira', 'Mecânico Sênior', 'marcos@oficina.com', 1);
+        INSERT INTO mecanico (nome, cargo, email, senha, fk_mecanico_id_mecanico) VALUES 
+        ('Carlos Mestre', 'Chefe de Oficina', 'carlos@oficina.com', '1234', NULL),
+        ('Pedro Aprendiz', 'Auxiliar', 'pedro@oficina.com','1234', 1),
+        ('Roberto Silva', 'Mecânico Especialista', 'roberto@oficina.com','1234', 1),
+        ('Fernando Costa', 'Mecânico', 'fernando@oficina.com','1234', 1),
+        ('Lucas Alves', 'Auxiliar', 'lucas@oficina.com', '1234', 1),
+        ('Marcos Oliveira', 'Mecânico Sênior', 'marcos@oficina.com', '1234', 1);
         """,
         """
         INSERT INTO veiculo (marca, modelo, ano, cor, placa, fk_cliente_id_cliente) VALUES 

@@ -58,4 +58,6 @@ __all__ = [
     'consulta1_faturamento_por_tipo_servico',
     'consulta2_quantidade_servicos_por_cliente',
     'consulta3_valor_pecas_por_fornecedor',
+    'adicionar_peca_servico',
+    'login_mecanico',
 ]

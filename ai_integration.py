@@ -1,7 +1,7 @@
 import google.genai as genai
 import os
 
-client = genai.Client(api_key="AIzaSyD0AySEzmIEUBXgCDuN_CPuHZYoHocCbXU")
+client = genai.Client(api_key="AIzaSyAklcrH3qTp5bWxmmTgNF-DnWKkfnjd3qM")
 
 
 
