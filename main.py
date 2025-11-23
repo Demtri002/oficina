@@ -237,6 +237,9 @@ def menu_relatorios(conn):
         print("7. Consultar com IA (Gemini)")
         print("8. Consultar Mecânicos")
         print("9. Consultar Fornecedores")
+        print("10. Consulta Sumarizada 1: Faturamento por Tipo de Serviço (com gráfico)")
+        print("11. Consulta Sumarizada 2: Quantidade de Serviços por Cliente (com gráfico)")
+        print("12. Consulta Sumarizada 3: Valor de Peças por Fornecedor (com gráfico)")
         print("0. Voltar ao Menu Principal")
         escolha = input("Digite sua escolha: ")
 
@@ -272,6 +275,12 @@ def menu_relatorios(conn):
             listar_mecanicos(conn)
         elif escolha == '9':
             listar_fornecedores(conn)
+        elif escolha == '10':
+            consulta1_faturamento_por_tipo_servico(conn)
+        elif escolha == '11':
+            consulta2_quantidade_servicos_por_cliente(conn)
+        elif escolha == '12':
+            consulta3_valor_pecas_por_fornecedor(conn)
         elif escolha == '0':
             break
         else:

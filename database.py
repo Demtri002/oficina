@@ -55,4 +55,7 @@ __all__ = [
     'consultar_faturamento_por_periodo',
     'adicionar_nota_fiscal',
     'cadastrar_tipo_pagamento',
+    'consulta1_faturamento_por_tipo_servico',
+    'consulta2_quantidade_servicos_por_cliente',
+    'consulta3_valor_pecas_por_fornecedor',
 ]

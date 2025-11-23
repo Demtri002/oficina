@@ -306,55 +306,142 @@ def inserir_dados_iniciais(conn):
         """
         INSERT INTO cliente (nome, telefone, email, cpf, endereco) VALUES 
         ('João Silva', '11999999999', 'joao@email.com', '11122233344', 'Rua das Flores, 123'),
-        ('Maria Oliveira', '21988888888', 'maria@email.com', '55566677788', 'Av. Paulista, 900');
+        ('Maria Oliveira', '21988888888', 'maria@email.com', '55566677788', 'Av. Paulista, 900'),
+        ('Pedro Santos', '31977777777', 'pedro@email.com', '99988877766', 'Rua Central, 456'),
+        ('Ana Costa', '41966666666', 'ana@email.com', '44455566677', 'Av. Principal, 789'),
+        ('Carlos Ferreira', '51955555555', 'carlos@email.com', '33344455566', 'Rua Nova, 321'),
+        ('Juliana Lima', '61944444444', 'juliana@email.com', '22233344455', 'Av. Comercial, 654');
         """,
         """
         INSERT INTO fornecedor (nome) VALUES 
         ('Auto Peças Brasil'),
-        ('Distribuidora Mecânica Total');
+        ('Distribuidora Mecânica Total'),
+        ('Peças Premium Ltda'),
+        ('Fornecedor Nacional'),
+        ('Auto Supply S.A.'),
+        ('Distribuidora Central');
         """,
         """
         INSERT INTO tipo_servico (nome, descricao, valor) VALUES 
         ('Troca de Óleo', 'Troca de óleo do motor e filtro', 150.00),
         ('Alinhamento', 'Alinhamento e balanceamento das rodas', 120.00),
-        ('Revisão Completa', 'Verificação geral de freios, suspensão e motor', 450.00);
+        ('Revisão Completa', 'Verificação geral de freios, suspensão e motor', 450.00),
+        ('Troca de Pneus', 'Troca e balanceamento de pneus', 200.00),
+        ('Reparo de Freios', 'Troca de pastilhas e discos de freio', 350.00),
+        ('Troca de Bateria', 'Substituição de bateria automotiva', 250.00);
         """,
         """
         INSERT INTO tipo_pagamento (cnpj) VALUES 
         ('00.000.000/0001-99'),
-        ('11.111.111/0001-11');
+        ('11.111.111/0001-11'),
+        ('22.222.222/0001-22'),
+        ('33.333.333/0001-33'),
+        ('44.444.444/0001-44'),
+        ('55.555.555/0001-55');
         """,
         """
         INSERT INTO mecanico (nome, cargo, email, fk_mecanico_id_mecanico) VALUES 
-        ('Carlos Mestre', 'Chefe de Oficina', 'carlos@oficina.com', NULL);
-        """,
-        """
-        INSERT INTO mecanico (nome, cargo, email, fk_mecanico_id_mecanico) VALUES 
-        ('Pedro Aprendiz', 'Auxiliar', 'pedro@oficina.com', 1); 
+        ('Carlos Mestre', 'Chefe de Oficina', 'carlos@oficina.com', NULL),
+        ('Pedro Aprendiz', 'Auxiliar', 'pedro@oficina.com', 1),
+        ('Roberto Silva', 'Mecânico Especialista', 'roberto@oficina.com', 1),
+        ('Fernando Costa', 'Mecânico', 'fernando@oficina.com', 1),
+        ('Lucas Alves', 'Auxiliar', 'lucas@oficina.com', 1),
+        ('Marcos Oliveira', 'Mecânico Sênior', 'marcos@oficina.com', 1);
         """,
         """
         INSERT INTO veiculo (marca, modelo, ano, cor, placa, fk_cliente_id_cliente) VALUES 
         ('Fiat', 'Uno', 2010, 'Prata', 'ABC1234', 1),
-        ('Toyota', 'Corolla', 2022, 'Preto', 'XYZ9876', 2);
+        ('Toyota', 'Corolla', 2022, 'Preto', 'XYZ9876', 2),
+        ('Volkswagen', 'Gol', 2018, 'Branco', 'DEF5678', 3),
+        ('Ford', 'Ka', 2015, 'Vermelho', 'GHI9012', 4),
+        ('Chevrolet', 'Onix', 2020, 'Azul', 'JKL3456', 5),
+        ('Honda', 'Civic', 2019, 'Prata', 'MNO7890', 6),
+        ('Fiat', 'Palio', 2012, 'Preto', 'PQR1234', 1),
+        ('Renault', 'Sandero', 2017, 'Branco', 'STU5678', 2);
         """,
         """
         INSERT INTO peca (nome_peca, descricao_peca, fk_fornecedor_id_fornecedor, valor_unit) VALUES 
         ('Filtro de Óleo', 'Filtro padrão universal', 1, 100.00),
-        ('Pastilha de Freio', 'Cerâmica', 2, 200.00);
+        ('Pastilha de Freio', 'Cerâmica', 2, 200.00),
+        ('Bateria 60Ah', 'Bateria automotiva 12V', 3, 350.00),
+        ('Pneu Aro 15', 'Pneu 185/60 R15', 4, 450.00),
+        ('Disco de Freio', 'Disco dianteiro', 5, 280.00),
+        ('Filtro de Ar', 'Filtro de ar condicionado', 1, 80.00),
+        ('Óleo Motor 5W30', 'Óleo sintético 5L', 2, 120.00),
+        ('Amortecedor Dianteiro', 'Amortecedor original', 3, 550.00),
+        ('Correia Dentada', 'Correia de distribuição', 4, 180.00),
+        ('Radiador', 'Radiador completo', 5, 650.00);
         """,
         """
         INSERT INTO agendamento (data, fk_veiculo_id_veiculo) VALUES 
-        ('2025-12-01 08:00:00', 1),
-        ('2025-12-02 14:00:00', 2);
+        ('2025-01-15 08:00:00', 1),
+        ('2025-01-16 09:00:00', 2),
+        ('2025-01-17 10:00:00', 3),
+        ('2025-01-18 11:00:00', 4),
+        ('2025-01-19 14:00:00', 5),
+        ('2025-01-20 15:00:00', 6),
+        ('2025-01-21 08:30:00', 7),
+        ('2025-01-22 09:30:00', 8);
         """,
         """
-        INSERT INTO servico (descricao, fk_agendamento_id_agendamento) VALUES 
-        ('Cliente relatou barulho no motor', 1);
+        INSERT INTO servico (descricao, fk_agendamento_id_agendamento, status) VALUES 
+        ('Cliente relatou barulho no motor', 1, 'FINALIZADO'),
+        ('Revisão periódica solicitada', 2, 'FINALIZADO'),
+        ('Problema no sistema de freios', 3, 'FINALIZADO'),
+        ('Troca de pneus necessária', 4, 'FINALIZADO'),
+        ('Bateria descarregando', 5, 'FINALIZADO'),
+        ('Manutenção preventiva', 6, 'EM_ANDAMENTO'),
+        ('Reparo na suspensão', 7, 'EM_ANDAMENTO'),
+        ('Troca de óleo e filtros', 8, 'ABERTO');
         """,
         """
         INSERT INTO itens_servico (fk_servico_id_servico, fk_tipo_servico_id_tiposervico, valor_aplicado) VALUES 
         (1, 1, 150.00),
-        (1, 3, 450.00);
+        (1, 3, 450.00),
+        (2, 3, 450.00),
+        (2, 2, 120.00),
+        (3, 5, 350.00),
+        (3, 1, 150.00),
+        (4, 4, 200.00),
+        (5, 6, 250.00),
+        (5, 1, 150.00),
+        (6, 3, 450.00),
+        (7, 5, 350.00),
+        (8, 1, 150.00);
+        """,
+        """
+        INSERT INTO servico_peca (fk_peca_id_peca, fk_servico_id_servico, quantidade) VALUES 
+        (1, 1, 1),
+        (2, 3, 2),
+        (3, 5, 1),
+        (4, 4, 4),
+        (5, 3, 2),
+        (6, 1, 1),
+        (7, 8, 1),
+        (8, 7, 2),
+        (9, 6, 1),
+        (10, 7, 1);
+        """,
+        """
+        INSERT INTO nota_fiscal (valor_pagamento, fk_servico_id_servico, cpf_na_nota, data_emissao) VALUES 
+        (600.00, 1, '11122233344', '2025-01-15'),
+        (570.00, 2, '55566677788', '2025-01-16'),
+        (500.00, 3, '99988877766', '2025-01-17'),
+        (200.00, 4, '44455566677', '2025-01-18'),
+        (400.00, 5, '33344455566', '2025-01-19');
+        """,
+        """
+        INSERT INTO mecanico_servico (fk_mecanico_id_mecanico, fk_servico_id_servico) VALUES 
+        (1, 1),
+        (2, 1),
+        (3, 2),
+        (1, 3),
+        (4, 3),
+        (5, 4),
+        (3, 5),
+        (6, 6),
+        (2, 7),
+        (4, 8);
         """
     ]
 
