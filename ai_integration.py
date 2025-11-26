@@ -1,7 +1,7 @@
 import google.genai as genai
 import os
 
-client = genai.Client(api_key="AIzaSyAklcrH3qTp5bWxmmTgNF-DnWKkfnjd3qM")
+client = genai.Client(api_key="AIzaSyAlbcUBtX2aw7hrl2pdrTvq-QGnJXJPxwM")
 
 
 
@@ -111,7 +111,7 @@ def perguntar_ao_banco_com_ia(pergunta_usuario, conn):
     """
 
     try:
-        response = client.models.generate_content(model = 'gemini-2.5-pro', contents = prompt_2)
+        response = client.models.generate_content(model = 'gemini-2.5-flash', contents = prompt_2)
         resposta_final = response.text.strip()
         return resposta_final
     except Exception as e:

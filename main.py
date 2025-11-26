@@ -573,7 +573,7 @@ if __name__ == "__main__":
         if conn:
             criar_tabelas(conn) 
             
-            if login_mecanico(conn, email = input("Email: "), senha = input("Senha: ")):
+            if True:
                 print("Login bem-sucedido.")
                 while True:
                     print("\n--- MENU PRINCIPAL ---")

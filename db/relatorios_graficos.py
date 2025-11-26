@@ -176,9 +176,6 @@ def consulta3_valor_pecas_por_fornecedor(conn):
         print(f"Erro ao executar consulta 3: {e}")
 
 def gerar_grafico_barras(labels, valores, titulo, label_x, label_y, nome_arquivo):
-    """
-    Gera um gráfico de barras e salva como arquivo PNG
-    """
     try:
         plt.figure(figsize=(12, 6))
         plt.bar(range(len(labels)), valores, color='steelblue', edgecolor='black')

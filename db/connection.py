@@ -6,7 +6,7 @@ def conecta():
     try:
         conn = psycopg2.connect(
             user="postgres",
-            password="1234", 
+            password="1010", 
             host="localhost",
             port="5432",
             database="oficina"
@@ -294,7 +294,7 @@ def criar_tabelas(conn):
         for command in commands:
             cur.execute(command)
         conn.commit()
-        print("Estrutura de tabelas (Lógico_2) verificada com sucesso!")
+        print("Estrutura de tabelas verificada com sucesso!")
     except (Exception, psycopg2.DatabaseError) as error:
         print(f"Erro ao criar tabelas: {error}")
         conn.rollback()
